@@ -1,0 +1,41 @@
+﻿      -------------------------------------------------------------------
+                       STM32CubeProgrammer v2.23.0                  
+      -------------------------------------------------------------------
+
+ST-LINK SN  : 37FF71064E573436E9171343
+ST-LINK FW  : V2J48S7
+Board       : --
+Voltage     : 4.11V
+SWD freq    : 100 KHz
+Connect mode: Hot Plug
+Reset mode  : Software reset
+Device ID   : 0x410
+Revision ID : Rev X
+Device name : STM32F101/F102/F103 Medium-density
+NVM size    : 64 KBytes
+Device type : MCU
+Device CPU  : Cortex-M3
+BL Version  : --
+
+
+UPLOADING ...
+  File          : C:\Users\daitr\Downloads\code_test_xetranhvatcan_v1\runs\20261122-t14-teach-022fa138\ram.bin
+  Size          : 1312 Bytes
+  Address:      : 0x20000130
+Read progress:
+�������������������������������������������������� 0%
+�������������������������������������������������� 100%
+
+Data read successfully
+Time elapsed during read operation is: 00:00:00.176
+
+UPLOADING ...
+  File          : C:\Users\daitr\Downloads\code_test_xetranhvatcan_v1\runs\20261122-t14-teach-022fa138\route-flash.bin
+  Size          : 2048 Bytes
+  Address:      : 0x800F800
+Read progress:
+�������������������������������������������������� 50%
+�������������������������������������������������� 100%
+
+Data read successfully
+Time elapsed during read operation is: 00:00:00.273

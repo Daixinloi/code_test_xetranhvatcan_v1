@@ -1,0 +1,96 @@
+:root {
+  color-scheme: dark;
+  font: 16px/1.5 "Segoe UI", system-ui, sans-serif;
+  color: #eaf2f7;
+  background: #101a25;
+  --card: #172533;
+  --line: #314254;
+  --muted: #a7bbcb;
+  --cyan: #69e5de;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(1440px, 100%); margin: auto; padding: 34px clamp(14px, 4vw, 54px); }
+.page-header, .card-header, .controls, .timeline { display: flex; align-items: center; gap: 14px; }
+.page-header, .card-header { justify-content: space-between; }
+.page-header { margin-bottom: 24px; flex-wrap: wrap; }
+h1, h2, p { margin: 0; }
+h1 { font-size: clamp(1.75rem, 4vw, 2.7rem); line-height: 1.18; letter-spacing: -.04em; }
+h2 { font-size: 1.2rem; letter-spacing: -.02em; }
+.project { color: var(--cyan); font-size: .88rem; font-weight: 700; margin-bottom: 4px; }
+.project span, .card-header p { color: var(--muted); }
+.card-header p { font-size: .9rem; margin-top: 4px; }
+.connection { display: flex; align-items: center; gap: 9px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 24px; color: var(--muted); }
+.connection i, .legend i { display: inline-block; flex: none; }
+.connection i { border-radius: 50%; width: 8px; height: 8px; background: #f0bb68; }
+.connection[data-state="live"] i { background: var(--cyan); }
+.connection[data-state="error"] i { background: #ff9a92; }
+.connection[data-state="disabled"] i { background: var(--muted); }
+.dashboard { display: grid; grid-template-columns: minmax(0, 1fr) minmax(275px, .35fr); gap: 18px; align-items: start; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.card-header { padding: 17px 20px; }
+.stage { color: var(--cyan); font-size: .875rem; white-space: nowrap; }
+canvas { display: block; width: 100%; height: auto; background: #111d29; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; padding: 12px 20px; color: var(--muted); font-size: .88rem; }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.legend i { width: 15px; height: 9px; border-radius: 2px; }
+.legend .route-key { height: 3px; background: var(--cyan); }
+.legend .obstacle-key { background: #bacad2; }
+.legend .exclusion-key { background: #a15a45; }
+.controls { padding: 12px 20px 2px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+button, select { min-height: 40px; border-radius: 7px; font: inherit; }
+button { color: #10232d; background: var(--cyan); border: 1px solid var(--cyan); font-weight: 650; padding: 6px 13px; cursor: pointer; }
+button.secondary, select { color: #eaf2f7; background: #243646; border: 1px solid #496275; }
+button:disabled { opacity: .55; cursor: default; }
+.speed { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .88rem; margin-left: auto; }
+select { appearance: none; padding: 3px 30px 3px 10px; background-image: linear-gradient(45deg, transparent 50%, #abc0ce 50%), linear-gradient(135deg, #abc0ce 50%, transparent 50%); background-position: calc(100% - 15px) center, calc(100% - 10px) center; background-size: 5px 5px; background-repeat: no-repeat; }
+.timeline { padding: 10px 20px 15px; }
+input[type="range"] { flex: 1; min-width: 0; accent-color: var(--cyan); }
+.timeline output { color: var(--muted); min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+.telemetry .card-header { border-bottom: 1px solid var(--line); }
+.telemetry-summary { display: grid; grid-template-columns: minmax(64px, .55fr) minmax(0, 1fr); gap: 12px; padding: 16px 20px; }
+.field-label { display: block; color: var(--muted); font-size: .88rem; }
+.telemetry-summary strong { font-variant-numeric: tabular-nums; color: var(--cyan); }
+#angle { font-size: 1.45rem; }
+#command { display: block; margin-top: 6px; overflow-wrap: anywhere; line-height: 1.3; }
+.sensors { margin: 0; padding: 0 20px; }
+.sensors div { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); }
+.sensors span { margin-left: 6px; color: var(--muted); font-size: .88rem; }
+.sensors dd { margin: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.telemetry-foot { border-top: 1px solid var(--line); margin-top: 8px; padding: 14px 20px 18px; color: var(--muted); font-size: .88rem; }
+.telemetry-foot p + p { margin-top: 6px; }
+:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+@media (max-width: 825px) {
+  .dashboard { grid-template-columns: minmax(0, 1fr); }
+  .telemetry-summary { grid-template-columns: 1fr 2fr; }
+}
+
+@media (max-width: 440px) {
+  .card-header, .legend, .controls, .timeline { padding-left: 12px; padding-right: 12px; }
+  .speed { margin-left: 0; }
+}
+.legend .estimate-key {
+  width: 20px;
+  height: 0;
+  border-top: 2px dashed #ffcb87;
+}
+
+.legend .reference-key {
+  width: 20px;
+  height: 0;
+  border-top: 2px dashed #c5a5ff;
+}
+
+#sample {
+  color: #b4c6d1;
+  font-size: .875rem;
+  margin: .7rem 0 0;
+}
+.drive-panel { border-top: 1px solid var(--line); margin-top: 8px; padding: 14px 20px; }
+.drive-panel h3 { margin: 0; font-size: 1rem; }
+.drive-panel p, #drive-status { color: var(--muted); font-size: .88rem; }
+.drive-actions { display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0; }
+.drive-actions button { padding-inline: 9px; }
+.drive-actions .stop-drive { background: #ff9a92; border-color: #ff9a92; }

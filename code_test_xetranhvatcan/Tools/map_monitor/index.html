@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a25">
+  <title>Bản đồ xe STM32</title>
+  <link rel="stylesheet" href="/map.css">
+  <script defer src="/map.js"></script>
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <div>
+        <p class="project">STM32 <span> / </span> HC-06</p>
+        <h1>Bản đồ chạy chữ U</h1>
+      </div>
+      <div class="connection" id="connection" data-state="pending" role="status">
+        <i></i><span id="connection-text">Đang kết nối Bluetooth</span>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <section class="card map-card" aria-labelledby="map-title">
+        <header class="card-header">
+          <div>
+            <h2 id="map-title">Mô phỏng lộ trình</h2>
+            <p id="route-summary">Sân 180 × 120 cm</p>
+          </div>
+          <output class="stage" id="stage">Đang tải</output>
+        </header>
+
+        <canvas id="course" width="1080" height="780" aria-label="Sân chữ U, vật cản và quỹ đạo mô phỏng"></canvas>
+        <div class="legend">
+          <span><i class="reference-key"></i> Tuyến đã bo cua</span>
+          <span><i class="route-key"></i> Quỹ đạo</span>
+          <span><i class="estimate-key"></i> Encoder ước tính</span>
+          <span><i class="obstacle-key"></i> Vật cản tĩnh</span>
+          <span><i class="exclusion-key"></i> Vùng cấm</span>
+        </div>
+
+        <div class="controls">
+          <label class="speed">Ca kiểm thử
+            <select id="scenario" disabled>
+              <option value="nominal">Đủ vật cản T1–T17</option>
+              <option value="first_bend">Cua đầu · Hệ số mới</option>
+              <option value="first_bend_old">Cua đầu · Tái hiện hệ số cũ</option>
+              <option value="slip">Trượt 5 mm ở chặng cuối</option>
+              <option value="extra">Thêm vật cản ở chặng Đông</option>
+              <option value="south">Vật cản ở làn ngoài chặng cuối</option>
+              <option value="join">Vật cản ở cửa khe T15</option>
+              <option value="t9">Thêm vật cản cạnh T9</option>
+              <option value="t11">Thêm vật cản cạnh T11</option>
+              <option value="t14">Thêm vật cản cạnh T14</option>
+              <option value="curve_lag">Bánh đáp ứng chậm khi cua</option>
+              <option value="t14_lag">Bánh đáp ứng chậm, có vật cản cạnh T14</option>
+              <option value="edge">Xe chạy dài hơn 5%</option>
+              <option value="north_short">Trượt bánh ở chặng Bắc rồi lấy lại độ bám</option>
+              <option value="t9_short">Chặng Bắc đi ngắn · Kiểm tra khoảng hở T9</option>
+              <option value="start_yaw_error">Xe đặt lệch hướng Bắc 3°</option>
+              <option value="arc_before">Vật cản sau T11 · Né vòng cung</option>
+              <option value="arc_before_lag">Né vòng cung · Bánh đáp ứng chậm</option>
+              <option value="fast_first_curve">Cua đầu · Xe vào nhanh, lái đáp ứng chậm</option>
+            </select>
+          </label>
+          <button type="button" id="play" disabled>Chạy mô phỏng</button>
+          <button type="button" class="secondary" id="reset" disabled>Về đầu</button>
+          <label class="speed">Tốc độ
+            <select id="rate">
+              <option value="0.5">0,5×</option>
+              <option value="1">1×</option>
+              <option value="2" selected>2×</option>
+              <option value="4">4×</option>
+            </select>
+          </label>
+        </div>
+        <div class="timeline">
+          <input type="range" id="seek" min="0" max="1" value="0" aria-label="Vị trí trong mô phỏng" disabled>
+          <output id="time">0,0 s</output>
+        </div>
+        <p id="sample" aria-live="off"></p>
+      </section>
+
+      <aside class="card telemetry" aria-labelledby="telemetry-title">
+        <header class="card-header">
+          <div>
+            <h2 id="telemetry-title">Xe thật</h2>
+            <p id="serial">COM16 <span>·</span> 9600 baud</p>
+          </div>
+        </header>
+        <div class="telemetry-summary">
+          <div><span class="field-label">Góc MPU</span><strong id="angle">—</strong></div>
+          <div><span class="field-label">Trạng thái</span><strong id="command">—</strong></div>
+        </div>
+        <dl class="sensors" aria-label="Khoảng cách ToF">
+          <div><dt>HT <span>Hông trái</span></dt><dd id="HT">—</dd></div>
+          <div><dt>TL <span>Trước trái</span></dt><dd id="TL">—</dd></div>
+          <div><dt>G <span>Chính giữa</span></dt><dd id="G">—</dd></div>
+          <div><dt>TR <span>Trước phải</span></dt><dd id="TR">—</dd></div>
+          <div><dt>HP <span>Hông phải</span></dt><dd id="HP">—</dd></div>
+        </dl>
+        <section class="drive-panel" aria-label="Điều khiển xe qua Bluetooth">
+          <h3>Lái và ghi đường</h3>
+          <p id="drive-mode">Đang kiểm tra chế độ điều khiển của xe.</p>
+          <div class="drive-actions">
+            <button data-drive="W" disabled>W · Tiến</button>
+            <button data-drive="s" disabled>↓ Lùi</button>
+            <button data-drive="x" class="stop-drive" disabled>Dừng (X)</button>
+            <button data-drive="u" class="secondary" disabled>← Trái 45°</button>
+            <button data-drive="p" class="secondary" disabled>Phải 45° →</button>
+            <button data-drive="A" class="secondary" disabled>A · Xoay trái</button>
+            <button data-drive="D" class="secondary" disabled>D · Xoay phải</button>
+          </div>
+          <div class="drive-actions">
+            <button data-drive="record" disabled>Bắt đầu ghi</button>
+            <button data-drive="save" class="secondary" disabled>Lưu lượt chạy</button>
+          </div>
+          <output id="drive-status" aria-live="polite">Đang chờ Bluetooth.</output>
+        </section>
+        <div class="telemetry-foot">
+          <p id="last-frame">Đang chờ khung dữ liệu.</p>
+          <p id="dropped"></p>
+          <p>Đường ghi màu xanh lá là vị trí ước tính từ encoder và MPU.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

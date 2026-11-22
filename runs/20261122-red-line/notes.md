@@ -1,0 +1,10 @@
+# Bù tuyến theo hình vệt đỏ ngày 2026-11-22
+
+- Người dùng đã sửa code và báo xe chạy theo vệt đỏ trong ảnh, đang tắt ToF. Ảnh cho thấy đoạn xuống sát biên trong. Chưa có log chạy thật cùng firmware, ảnh dùng làm quan sát gần đúng.
+- Nguồn mới nhất trước sửa có tuyến đến (1190, 696), rồi xuống (1190, -55) mm. Tim làn này nằm trong mép vùng giữa X = 1200 mm. Đoạn ngang tới (480, 730) mm cũng thiếu khoảng hở với T9. Đã sửa tuyến tại Inc/course_route.h.
+- Tuyến bù dùng các điểm (420, 640), (490, 770), (503, 880), (955, 875), (1152, 700), (1300, 700), (1300, 125), (1300, -65) mm. Xuất phát tâm (420, -45) mm, hướng Bắc. Hệ số encoder hiện có từ người dùng bằng kích thước bánh 34 mm và 770 xung/vòng, khoảng 0,13872 mm/xung, được giữ khi sửa tuyến. Chưa hiệu chuẩn thêm từ ảnh.
+- Nhánh tuyến cố định được chọn rõ bằng COURSE_FIXED_LINE_TEST, route_u và mốc X = 420 mm. Đã thêm kiểm tra lỗi MPU, lỗi chuyển động và biên sân ở nhánh này. Dung sai chạm điểm 8 mm tránh đuổi điểm sát khi xe đã trôi qua. ToF bị bỏ qua trong nhánh chạy tuyến cố định hiện tại của người dùng.
+- Chín nhóm Tests/run_checks.ps1 qua. Test Teach đã dùng hệ số hiện tại thay giá trị khoảng cách cố định. Test trace xác nhận dừng khi MPU mất sẵn sàng, lỗi encoder và tới đích. simulation.json là kết quả mô phỏng PC, không phải telemetry xe thật.
+- Kiểm tra hình học theo toàn bộ trace và nội suy từng 1 mm/0,1° cho thân 90 × 90 mm cộng 17 mm mỗi phía qua map 17 vật cản và vùng giữa. Tọa độ đích mô phỏng (1300, -65) mm, hướng -90°. Đây là kết quả trên map cấu hình.
+- Debug ban đầu tràn flash. Tối ưu -Os thêm cho stm32f1xx_hal.c và stm32f1xx_hal_rcc_ex.c giúp Debug vừa 65536/65536 byte. Release dùng 64732/65536 byte. Đã tạo HEX/ELF tương ứng trong build/Debug và build/Release.
+- ST-LINK ban đầu không xuất hiện, lần kiểm tra cuối đọc được vector (20005000, 0800CBE1) và probe báo 4,08 V. Chưa đối chiếu toàn firmware đang chạy. Chưa nạp và chưa thử tuyến bù trên sàn thật. Lần tới dùng đúng Release cùng ELF khi nguồn đã kiểm tra, đặt đúng mốc, chạy v rồi j, giữ x sẵn và đối chiếu vị trí ở T9/T14.

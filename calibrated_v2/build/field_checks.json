@@ -1,0 +1,117 @@
+{
+  "date": "2026-11-16",
+  "motor_baseline": "baseline_v2_original/code_test_xetranhvatcan (unmodified archive extraction)",
+  "baseline_motor_files_byte_identical": true,
+  "hardware_confirmed": {
+    "original_hex_both_wheels": true,
+    "restored_pb8_pb9_bench_both_wheels": true,
+    "integrated_step_w_both_wheels": true,
+    "integrated_step_s_both_wheels": true
+  },
+  "sensor_checks": {
+    "mpu_id": "0x70",
+    "mpu_runtime_ready": true,
+    "tof_i2c_errors_observed": 0,
+    "right_diagonal_100mm_reference": {
+      "raw_mm": [
+        186,
+        186,
+        187,
+        187,
+        184,
+        184
+      ],
+      "corrected_mm": [
+        101,
+        101,
+        102,
+        102,
+        99,
+        99
+      ],
+      "result": "valid, matches reference"
+    },
+    "left_diagonal_individual_reference": {
+      "reference_mm": 100,
+      "raw_mm": [
+        155,
+        156,
+        156,
+        156,
+        156,
+        156
+      ],
+      "corrected_mm": [
+        100,
+        101,
+        101,
+        101,
+        101,
+        101
+      ],
+      "offset_mm": 55,
+      "i2c_errors": 0,
+      "result": "valid, matches reference after user corrected target placement; mapping and offset unchanged"
+    },
+    "front_wide_card": {
+      "result": "all three front channels returned fresh valid readings; values alone not sufficient to recalibrate offsets"
+    },
+    "right_flank": {
+      "result": "invalid range without a dedicated target; not proven faulty"
+    }
+  },
+  "tests": "8 host suites passed, including board outputs, motion, bench, clearance, A* vs BFS, 17+1 ray simulation, ToF offset and init/error paths",
+  "limitations": [
+    "No full-field hardware A* run yet",
+    "MPU does not measure translation lost to wheel slip",
+    "Lateral ToF offsets remain photo estimates"
+  ],
+  "mpu_recovery_2026_11_17": {
+    "observed_failure": "connected MPU6500, stationary calibration rejected, motion state 3",
+    "address": "0x68",
+    "identity": "0x70",
+    "i2c_errors": 0,
+    "startup_variance_dps2": 361.207,
+    "fix": "nonblocking 200-sample stationary retry, motor-output interlock, no command auto-resume, invalidated map reference",
+    "post_flash_state": 4,
+    "post_flash_variance_dps2": 0.002,
+    "post_flash_sample_gap_ms": 12,
+    "tests": "startup motion/recovery, no calibration while bench output active, read failure, existing 8 suites pass"
+  },
+  "map_start_and_heading_2026_11_17": {
+    "observed_map_block": "clearance state 5 waiting for lost front range; V/G received but discarded",
+    "user_test_environment": "empty floor/table, fresh front raw 8191 without I2C transfer errors",
+    "changes": [
+      "V cancels clearance before start confirmation",
+      "clearance missing-range wait bounded to 1 second",
+      "named front invalid mask in map labels",
+      "manual consecutive steps preserve heading reference",
+      "G merges collinear cells up to 150 mm",
+      "explicit J empty-floor test, fresh no-range only, base speed<=400 and runs<=100 mm"
+    ],
+    "physical_j_test": "awaiting user observation",
+    "limitation": "Yaw correction cannot reconstruct translation lost to symmetric wheel spin or lateral slip; independent position reference still required",
+    "host_tests": "8 suites pass including merged 17+1 ray simulation, bounded sensor fault, repeated manual heading, empty-floor fresh/stale/near cases and mode-switch stop"
+  },
+  "j_start_fix_2026_11_17": {
+    "observed_failure": "J blocked entry after mapping five room returns into the virtual course; MPU ready, no latched fault",
+    "previous_planner_max_ms": 72,
+    "changes": [
+      "J resets observed cells and uses static virtual map; live ranges retain near-obstacle protection",
+      "G retains dynamic obstacle mapping",
+      "integer broad phase before float segment/ray intersections; observed-cell list; grid_map source O2"
+    ],
+    "tests": "8 suites pass, including complete J run with valid room returns and G 17+1 dynamic rerouting",
+    "flash": "download verified successfully",
+    "physical_retest": "User confirmed robot begins moving after V/J; received V,J,X; stopped with invalidated pose after explicit X",
+    "post_flash_mpu_state": 4,
+    "post_run_mpu_state": 4,
+    "post_run_mpu_last_fault": 0,
+    "post_run_mpu_i2c_errors": 0,
+    "post_run_planner_last_ms": 1,
+    "post_run_planner_max_ms": 4,
+    "post_run_observed_hits": 0,
+    "post_run_path_cells": 60,
+    "post_run_y_mm": 75
+  }
+}
