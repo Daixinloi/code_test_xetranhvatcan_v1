@@ -1,0 +1,90 @@
+﻿#include "grid_map.h"
+#include <math.h>
+#include <string.h>
+
+/* Millimetres. Traced from the supplied picture, NOT a surveyed map.
+ * Origin bottom-left, +X right, +Y up. Rectangles are closed for collision. */
+const GridRect grid_static_obstacles[18] = {
+    {0,100,100,200}, {500,200,600,300}, {250,300,350,400},
+    {500,400,600,500}, {0,500,100,600}, {0,700,100,800},
+    {300,850,400,950}, {400,1100,500,1200}, {600,700,700,800},
+    {700,600,800,700}, {800,950,900,1050}, {900,600,1000,700},
+    {1100,1100,1200,1200}, {1200,800,1300,900},
+    {1400,400,1500,500}, {1400,100,1500,200}, {1700,200,1800,300},
+    {600,0,1200,600}
+};
+
+static bool Get(const uint8_t *bits, unsigned n) { return (bits[n / 8] >> (n % 8)) & 1u; }
+static void Set(uint8_t *bits, unsigned n) { bits[n / 8] |= (uint8_t)(1u << (n % 8)); }
+
+static bool Contains(GridRect r, int x, int y, int inflation)
+{
+    /* Square expansion conservatively contains the circular turn footprint. */
+    return x >= r.x0 - inflation && x <= r.x1 + inflation &&
+           y >= r.y0 - inflation && y <= r.y1 + inflation;
+}
+
+static void Inflate(uint8_t *blocked, GridRect r, int pad)
+{
+    for (unsigned n = 0; n < GRID_NODES; ++n) {
+        int x = (n % GRID_WIDTH) * GRID_CELL_MM + GRID_CELL_MM / 2;
+        int y = (n / GRID_WIDTH) * GRID_CELL_MM + GRID_CELL_MM / 2;
+        if (Contains(r, x, y, pad)) Set(blocked, n);
+    }
+}
+
+void Grid_Init(GridMap *m, uint16_t inflation_mm)
+{
+    memset(m, 0, sizeof(*m));
+    m->inflation_mm = inflation_mm;
+    m->turn_padding_mm = inflation_mm;
+    m->result = GRID_NO_PATH;
+    /* Boundary fence. Stay inside even at the open start/finish lines. */
+    for (unsigned n = 0; n < GRID_NODES; ++n) {
+        int x = (n % GRID_WIDTH) * GRID_CELL_MM + GRID_CELL_MM / 2;
+        int y = (n / GRID_WIDTH) * GRID_CELL_MM + GRID_CELL_MM / 2;
+        if (x <= inflation_mm || y <= inflation_mm ||
+            x >= GRID_WIDTH * GRID_CELL_MM - inflation_mm ||
+            y >= GRID_HEIGHT * GRID_CELL_MM - inflation_mm) Set(m->blocked, n);
+    }
+    for (unsigned i = 0; i < 18; ++i) Inflate(m->blocked, grid_static_obstacles[i], inflation_mm);
+    memcpy(m->static_blocked, m->blocked, sizeof(m->static_blocked));
+}
+
+void Grid_SetMiddleClearance(GridMap *m, uint16_t extra_mm)
+{
+    m->middle_extra_mm = extra_mm;
+    Inflate(m->blocked, grid_static_obstacles[17], m->inflation_mm + extra_mm);
+    Inflate(m->static_blocked, grid_static_obstacles[17], m->inflation_mm + extra_mm);
+}
+
+uint16_t Grid_Cell(float x, float y)
+{
+    if (!isfinite(x) || !isfinite(y) || x < 0 || y < 0 ||
+        x >= GRID_WIDTH * GRID_CELL_MM || y >= GRID_HEIGHT * GRID_CELL_MM) return GRID_NONE;
+    return (uint16_t)((int)(y / GRID_CELL_MM) * GRID_WIDTH + (int)(x / GRID_CELL_MM));
+}
+
+void Grid_SetFrontSensors(GridMap *m, const int16_t forward[3], const int16_t left[3],
+    const int16_t angles[3], uint16_t center_mm, uint16_t diagonal_mm)
+{
+    const int c[4] = {1,0,-1,0}, s[4] = {0,1,0,-1};
+    for (unsigned i = 0; i < 3; ++i) {
+        float angle = angles[i] * 0.01745329252f;
+        uint16_t minimum = i == 1 ? center_mm : diagonal_mm;
+        float ex = forward[i] + minimum * cosf(angle);
+        float ey = left[i] + minimum * sinf(angle);
+        for (unsigned h = 0; h < 4; ++h) {
+            float *r = m->front_rays[h][i];
+            r[0] = forward[i]*c[h] - left[i]*s[h];
+            r[1] = forward[i]*s[h] + left[i]*c[h];
+            r[2] = ex*c[h] - ey*s[h]; r[3] = ex*s[h] + ey*c[h];
+        }
+    }
+    memset(m->front_checked, 0, sizeof(m->front_checked));
+    memset(m->front_unsafe, 0, sizeof(m->front_unsafe));
+    m->front_enabled = true;
+}
+
+bool Grid_IsBlocked(const GridMap *m, uint16_t n)
+{

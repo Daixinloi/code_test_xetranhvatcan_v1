@@ -1,0 +1,23 @@
+﻿navigation.c:81: #define NAV_TRACE_CAPACITY 192u
+navigation.c:82: #define NAV_TRACE_INTERVAL_MS 125u
+navigation.c:183: } nav_trace[NAV_TRACE_CAPACITY];
+navigation.c:184: static volatile uint32_t nav_trace_count;
+navigation.c:185: static uint32_t nav_trace_start, nav_trace_last;
+navigation.c:190: state == NAV_WAIT_SENSOR ? 750u : NAV_TRACE_INTERVAL_MS;
+navigation.c:191: if (!force && nav_trace_count && now - nav_trace_last < interval) return;
+navigation.c:192: unsigned index = nav_trace_count % NAV_TRACE_CAPACITY;
+navigation.c:193: nav_trace[index].elapsed_10ms = (uint16_t)((now - nav_trace_start) / 10u);
+navigation.c:194: nav_trace[index].x_mm = (int16_t)nav_diag.x_mm;
+navigation.c:195: nav_trace[index].y_mm = (int16_t)nav_diag.y_mm;
+navigation.c:199: nav_trace[index].heading_cdeg = (int16_t)heading;
+navigation.c:200: nav_trace[index].target_cdeg = (int16_t)(next_heading * 100.0f);
+navigation.c:202: nav_trace[index].front_mm[i] = front && front[i].valid &&
+navigation.c:204: nav_trace[index].state = (uint8_t)state;
+navigation.c:205: nav_trace_last = now;
+navigation.c:206: ++nav_trace_count;
+navigation.c:529: nav_trace_count = 0;
+navigation.c:530: nav_trace_start = HAL_GetTick();
+stlink_feed.py:32: if name in (*names, "nav_trace", "nav_trace_count"):
+stlink_feed.py:36: if name == "nav_trace":
+stlink_feed.py:106: (self.addresses["nav_trace_count"], 4),
+stlink_feed.py:107: (self.addresses["nav_trace"], self.trace_size),

@@ -1,0 +1,31 @@
+﻿bool Motion_RetargetForward(float distance_mm, float heading_deg)
+{
+    if (!isfinite(distance_mm) || distance_mm < 1.0f || distance_mm > 150.0f ||
+        !Motion_SteerForward(heading_deg)) return false;
+    step_distance_mm = EncoderDistance(Encoder_GetCount2()) + distance_mm;
+    started = HAL_GetTick();
+    return true;
+}
+
+static bool StartTurn(float angle_deg, bool curve, bool heading_turn)
+{
+    Motion_Cancel();
+    Motion_ResetManualHeading();
+    MPU6050_Data_t data;
+    if (!mpu_ready || motion_diag.state != 4 || !isfinite(angle_deg) || fabsf(angle_deg) < 0.1f) {
+        Finish(MOTION_SENSOR_ERROR);
+        return false;
+    }
+    if (!MPU6050_Read_All(mpu_bus, &data)) {
+        motion_diag.state = 5;
+        mpu_ready = false;
+        Finish(MOTION_SENSOR_ERROR);
+        return false;
+    }
+    RecordRaw(&data);
+    /* Absolute yaw remains visible while stopped; each turn is relative. */
+    target = angle + angle_deg;
+    motion_diag.turn_error_mdeg = 0;
+    curve_turn = curve;
+    turn_sign = angle_deg > 0.0f ? 1 : -1;
+    map_turn = heading_turn;

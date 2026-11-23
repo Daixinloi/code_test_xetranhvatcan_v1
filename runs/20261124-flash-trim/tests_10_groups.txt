@@ -1,0 +1,25 @@
+﻿PASS: baseline PB8/PB9 outputs for forward, reverse, turns, corrections, stop; other pins preserved
+model gain=0.45 friction=0: 790 ms, error=0.11 deg, status=2
+model gain=0.45 friction=0: 790 ms, error=-0.11 deg, status=2
+model gain=0.70 friction=140: 960 ms, error=-0.39 deg, status=2
+model gain=0.55 friction=100: 890 ms, error=0.42 deg, status=2
+model gain=0.55 friction=100: 1290 ms, error=-0.29 deg, status=2
+model gain=0.55 friction=30: 970 ms, error=-0.16 deg, status=2
+model gain=0.45 friction=140: 1300 ms, error=-0.32 deg, status=2
+model gain=0.55 friction=140: 2040 ms, error=1.60 deg, status=2
+model gain=0.90 friction=30: 290 ms, error=0.09 deg, status=2
+model gain=0.55 friction=120: 560 ms, error=0.20 deg, status=2
+model gain=0.55 friction=30: 220 ms, error=-1.84 deg, status=2
+model gain=0.45 friction=0: 420 ms, error=-1.40 deg, status=2
+model gain=0.45 friction=0: 570 ms, error=0.67 deg, status=2
+model gain=0.45 friction=0: 420 ms, error=1.40 deg, status=2
+model gain=0.45 friction=0: 570 ms, error=-0.67 deg, status=2
+PASS: gyro heading hold forward/reverse, smooth turns, distance, sensor/encoder faults
+PASS: teach tap/hold, timeout, flash fallback, replay, T14 route, stop, stale MPU, field boundary
+PASS: equal motor pulse, 700 ms stop, cancellation, no restart, tick wrap
+PASS: front sensors, hysteresis, recovery, bounded missing-sensor wait, stop, time/travel limits
+PASS: 17 obstacles, inflated footprint, A* matches BFS, dynamic replan, no route, bounded work
+PASS: map disabled until configured, pose confirmation, arrival, mid-step replan, stale ToF, MPU/encoder faults, stop
+PASS: measured floors -> zero, no underflow, linear offset, invalid ranges preserved, bounds
+PASS: telemetry frame matches snprintf byte for byte, CRC and overflow unchanged
+PASS: bounded reference calibration, init/start failures rejected, I2C errors preserved, partial samples rejected

@@ -3,10 +3,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define CLEARANCE_CENTER_MIN_MM        50
+#define CLEARANCE_CENTER_MIN_MM        30
 #define CLEARANCE_CENTER_RELEASE_MM    70
-#define CLEARANCE_DIAGONAL_MIN_MM      50
-#define CLEARANCE_DIAGONAL_RELEASE_MM  70
+#define CLEARANCE_DIAGONAL_MIN_MM      20
+#define CLEARANCE_DIAGONAL_RELEASE_MM  40
 #define CLEARANCE_TIMEOUT_MS      2000u
 #define CLEARANCE_MAX_COUNTS      1149u /* ~150 mm with 34 mm wheel, 818 counts/rev */
 

@@ -1,0 +1,4 @@
+﻿navigation.c:5: #include "course_route.h"
+navigation.c:26: #define U_FIRST_EAST_POINT 19u /* End of the first curved section in course_route.h. */
+course_route.h:1: #ifndef COURSE_ROUTE_H
+course_route.h:2: #define COURSE_ROUTE_H

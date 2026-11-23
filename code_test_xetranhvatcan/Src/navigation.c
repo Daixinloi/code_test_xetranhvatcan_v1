@@ -80,8 +80,44 @@
 #define U_DISTANCE_ROUNDING_MM 0.001f
 #define NAV_TRACE_CAPACITY 192u
 #define NAV_TRACE_INTERVAL_MS 125u
+/* Fixed-line local detour. A diagonal beam sees the obstacle the car is about to
+ * clip while the centre beam still looks down the empty lane: in the t9 case the
+ * centre read 1500 mm while the right beam read 92 mm, so a centre-only trigger
+ * cannot see that obstacle at all. The trigger is therefore "diagonal close AND
+ * centre clear", which also keeps the walls the diagonal beams see during a
+ * corner from starting a detour. On the empty course no sample satisfies both
+ * conditions, so the route is unchanged when nothing is in the way.
+ * The aim is pushed away from the obstacle by FIXED_LINE_OFFSET_MM and held for
+ * FIXED_LINE_HOLD_MM of travel, then ramped out over FIXED_LINE_RELEASE_MM so the
+ * car rejoins the waypoint line instead of stepping back in one jump. The
+ * waypoint capture is measured against the shifted aim, so the point index keeps
+ * advancing at the normal rate while the car runs beside the table line.
+ * Simulator sweep (runs/20261123-waypoint-avoid/sweep_offset_band.txt): at this
+ * hold distance offsets 30-40 mm clear the extra obstacle, 20-25 mm graze it and
+ * 45 mm and above clip T7 on the far side, so 35 mm sits in the middle of the
+ * usable band. */
+#define FIXED_LINE_SIDE_MM 100u
+#define FIXED_LINE_CENTRE_MM 300u
+#define FIXED_LINE_TOF_SYNC_MS 100
+#define FIXED_LINE_OFFSET_MM 40u
+#define FIXED_LINE_HOLD_MM 400u
+#define FIXED_LINE_RELEASE_MM 120u
+#define FIXED_LINE_SLOW_MM 160u
+#define FIXED_LINE_STOP_MM 25u
+#define FIXED_LINE_SIDE_SLOW_MM 180u
+#define FIXED_LINE_SIDE_SPEED_MM_S 200u
+#define FIXED_LINE_PROBE_SPEED_MM_S 140u
+#define FIXED_LINE_CRUISE_MM_S 300u
+#define FIXED_LINE_SLOW_FLOOR_MM_S 90u
+#define FIXED_LINE_PROBE_MM 80.0f
+#define FIXED_LINE_FORWARD_CHECK_MM 50u
 
 typedef enum { U_NORTH, U_EAST, U_SOUTH } RouteLeg;
+typedef enum {
+    FIXED_PROBE_IDLE, FIXED_PROBE_TURN_SIDE, FIXED_PROBE_MOVE_SIDE,
+    FIXED_PROBE_TURN_FORWARD, FIXED_PROBE_CHECK, FIXED_PROBE_TURN_OTHER,
+    FIXED_PROBE_MOVE_OTHER, FIXED_PROBE_TURN_FORWARD_OTHER
+} FixedProbePhase;
 typedef enum {
     LOCAL_IDLE, LOCAL_SHIFT, LOCAL_CHECK, LOCAL_FORWARD, LOCAL_BACKTRACK, LOCAL_JOIN,
     LOCAL_REFERENCE, LOCAL_ARC, LOCAL_BEND
@@ -118,6 +154,24 @@ static bool finishing;
 static bool empty_floor_test;
 static bool fixed_line_course;
 static unsigned fixed_line_point;
+/* Local detour on the fixed line: a diagonal beam that sees an obstacle beside
+ * the line shifts the aim away from it and holds the shift for a fixed travel
+ * distance, then releases it so the car rejoins the waypoint line. The direction
+ * is latched as a unit vector so a change of leg does not turn the detour into a
+ * different direction half way through. */
+static uint8_t fixed_line_offset;
+static float fixed_line_avoid_dx, fixed_line_avoid_dy;
+static bool fixed_line_pivot;
+static float fixed_line_avoid_x, fixed_line_avoid_y;
+static uint32_t fixed_line_center_tick;
+static uint8_t fixed_line_center_count;
+static FixedProbePhase fixed_probe_phase;
+static int8_t fixed_probe_side;
+static float fixed_probe_heading;
+static float fixed_probe_side_heading;
+static float fixed_probe_x, fixed_probe_y;
+static uint32_t fixed_probe_check_tick;
+static uint8_t fixed_probe_attempts;
 static bool narrow_detour;
 static int16_t detour_step;
 static bool tried_other_side;
@@ -250,6 +304,13 @@ static bool InsideFieldMargin(float tx, float ty)
 {
     return tx >= U_FIELD_EDGE_MM && tx <= GRID_WIDTH * GRID_CELL_MM - U_FIELD_EDGE_MM &&
         ty >= U_FIELD_EDGE_MM && ty <= GRID_HEIGHT * GRID_CELL_MM - U_FIELD_EDGE_MM;
+}
+
+static bool FixedLineRangeFresh(const NavigationRange *range, uint32_t now)
+{
+    bool clear_no_echo = range->no_echo &&
+        (range->mm == 8190u || range->mm == 8191u);
+    return (range->valid || clear_no_echo) && now - range->tick <= NAV_SENSOR_AGE_MS;
 }
 
 static bool InLeg(float tx, float ty)
@@ -514,6 +575,21 @@ static bool Start(bool test)
     fixed_line_course = COURSE_FIXED_LINE_TEST && cfg.route_u &&
         cfg.start_x_mm == COURSE_ROUTE_START_X_MM;
     fixed_line_point = 0;
+    fixed_line_offset = 0u;
+    fixed_line_avoid_dx = 0.0f;
+    fixed_line_avoid_dy = 0.0f;
+    fixed_line_avoid_x = 0.0f;
+    fixed_line_avoid_y = 0.0f;
+    fixed_line_pivot = false;
+    fixed_line_center_tick = UINT32_MAX;
+    fixed_line_center_count = 0u;
+    fixed_probe_phase = FIXED_PROBE_IDLE;
+    fixed_probe_side = 0;
+    fixed_probe_heading = 0.0f;
+    fixed_probe_side_heading = 0.0f;
+    fixed_probe_x = fixed_probe_y = 0.0f;
+    fixed_probe_check_tick = 0u;
+    fixed_probe_attempts = 0u;
     nav_trace_count = 0;
     nav_trace_start = HAL_GetTick();
     odometry_direction = 0;
@@ -1855,12 +1931,79 @@ static void SearchBlocked(void)
     State(NAV_SEARCH_BLOCKED);
 }
 
-static void FixedLineMove(void)
+static bool FixedLineProbeClear(int8_t side, float heading, float from_x, float from_y,
+    bool include_origin)
+{
+    float right_x = sinf(heading * DEG_RAD);
+    float right_y = -cosf(heading * DEG_RAD);
+    float tx = fixed_probe_x + side * FIXED_LINE_PROBE_MM * right_x;
+    float ty = fixed_probe_y + side * FIXED_LINE_PROBE_MM * right_y;
+    float fx = tx + FIXED_LINE_FORWARD_CHECK_MM * cosf(heading * DEG_RAD);
+    float fy = ty + FIXED_LINE_FORWARD_CHECK_MM * sinf(heading * DEG_RAD);
+    if (!InsideFieldMargin(tx, ty) || !InsideFieldMargin(fx, fy) ||
+        !CourseTravel(fixed_probe_x, fixed_probe_y, tx, ty) || !CourseRotate(tx, ty) ||
+        !CourseTravel(tx, ty, fx, fy))
+        return false;
+    return !include_origin || CourseTravel(from_x, from_y, tx, ty);
+}
+
+static bool StartFixedLineProbe(int8_t side, bool other_side)
+{
+    float angle = (fixed_probe_heading - side * 90.0f) * DEG_RAD;
+    float target_x = fixed_probe_x + cosf(angle) * FIXED_LINE_PROBE_MM;
+    float target_y = fixed_probe_y + sinf(angle) * FIXED_LINE_PROBE_MM;
+    if (other_side && !CourseTravel(x, y, target_x, target_y)) return false;
+    fixed_probe_side = side;
+    fixed_probe_side_heading = fixed_probe_heading - side * 90.0f;
+    fixed_probe_phase = other_side ? FIXED_PROBE_TURN_OTHER : FIXED_PROBE_TURN_SIDE;
+    next_heading = fixed_probe_side_heading;
+    Motion_SetCruise(FIXED_LINE_SLOW_FLOOR_MM_S);
+    if (fabsf(remainderf(next_heading - MapYaw(), 360.0f)) <= MOTION_ANGLE_TOLERANCE_DEG) {
+        fixed_probe_phase = other_side ? FIXED_PROBE_MOVE_OTHER : FIXED_PROBE_MOVE_SIDE;
+        State(NAV_READY);
+        return true;
+    }
+    if (!StartHeadingTurn()) { Fail(NAV_MPU_FAULT); return true; }
+    State(NAV_TURNING);
+    return true;
+}
+
+static bool BeginFixedLineProbe(float heading)
+{
+    fixed_probe_heading = heading;
+    fixed_probe_x = x;
+    fixed_probe_y = y;
+    fixed_probe_check_tick = 0u;
+    fixed_probe_attempts = 0u;
+    /* Right first. The 80 mm map padding is the requested edge clearance. */
+    for (int8_t side = 1; side >= -1; side -= 2) {
+        if (!FixedLineProbeClear(side, heading, x, y, false)) continue;
+        Motion_Cancel();
+        odometry_direction = 0;
+        State(NAV_READY);
+        if (StartFixedLineProbe(side, false)) return true;
+    }
+    Fail(NAV_SEARCH_BLOCKED);
+    return false;
+}
+
+static void FixedLineMove(const NavigationRange front[3])
 {
     if (!Motion_IsMPUReady()) { pose_valid = false; Fail(NAV_MPU_FAULT); return; }
     MotionStatus motion = Motion_GetStatus();
     if (state == NAV_TURNING) {
-        if (motion == MOTION_DONE) State(NAV_READY);
+        if (motion == MOTION_DONE) {
+            State(NAV_READY);
+            if (fixed_probe_phase == FIXED_PROBE_TURN_SIDE)
+                fixed_probe_phase = FIXED_PROBE_MOVE_SIDE;
+            else if (fixed_probe_phase == FIXED_PROBE_TURN_OTHER)
+                fixed_probe_phase = FIXED_PROBE_MOVE_OTHER;
+            else if (fixed_probe_phase == FIXED_PROBE_TURN_FORWARD ||
+                     fixed_probe_phase == FIXED_PROBE_TURN_FORWARD_OTHER) {
+                fixed_probe_phase = FIXED_PROBE_CHECK;
+                fixed_probe_check_tick = front[1].tick;
+            }
+        }
         else if (motion != MOTION_RUNNING) {
             nav_diag.motion_result = motion;
             pose_valid = false;
@@ -1876,37 +2019,222 @@ static void FixedLineMove(void)
     }
     if (state != NAV_READY && state != NAV_MOVING) return;
 
+    uint32_t now = HAL_GetTick();
+    bool centre_fresh = FixedLineRangeFresh(&front[1], now);
+    if (!centre_fresh) {
+        Fail(NAV_TOF_FAULT);
+        return;
+    }
+    /* Accelerate on clear runs. Begin easing down earlier on a frontal return,
+     * and cap speed when either diagonal beam sees a nearby obstacle so a T9
+     * side-step starts slowly. Probe maneuvers stay at a low fixed speed. */
+    uint16_t cruise = FIXED_LINE_CRUISE_MM_S;
+    if (front[1].mm < FIXED_LINE_SLOW_MM) {
+        uint16_t approach = front[1].mm > FIXED_LINE_STOP_MM ?
+            front[1].mm - FIXED_LINE_STOP_MM : 0u;
+        uint16_t span = FIXED_LINE_SLOW_MM - FIXED_LINE_STOP_MM;
+        cruise = FIXED_LINE_SLOW_FLOOR_MM_S +
+            (FIXED_LINE_CRUISE_MM_S - FIXED_LINE_SLOW_FLOOR_MM_S) *
+            approach / span;
+    }
+    if (FixedLineRangeFresh(&front[0], now) &&
+        FixedLineRangeFresh(&front[2], now) &&
+        (front[0].mm <= FIXED_LINE_SIDE_SLOW_MM ||
+         front[2].mm <= FIXED_LINE_SIDE_SLOW_MM) &&
+        cruise > FIXED_LINE_SIDE_SPEED_MM_S)
+        cruise = FIXED_LINE_SIDE_SPEED_MM_S;
+    if (fixed_probe_phase != FIXED_PROBE_IDLE && cruise > FIXED_LINE_PROBE_SPEED_MM_S)
+        cruise = FIXED_LINE_PROBE_SPEED_MM_S;
+    Motion_SetCruise(cruise);
+
+    if (fixed_probe_phase == FIXED_PROBE_MOVE_SIDE ||
+        fixed_probe_phase == FIXED_PROBE_MOVE_OTHER) {
+        if (state == NAV_READY) {
+            float distance = fixed_probe_phase == FIXED_PROBE_MOVE_OTHER ?
+                2.0f * FIXED_LINE_PROBE_MM : FIXED_LINE_PROBE_MM;
+            if (!Motion_StartDistanceHeading(1, distance,
+                    fixed_probe_side_heading - yaw_offset)) {
+                Fail(NAV_MOTION_FAULT);
+                return;
+            }
+            StartOdometry(1);
+            State(NAV_MOVING);
+            return;
+        }
+        if (state == NAV_MOVING && motion == MOTION_DONE) {
+            Motion_Cancel();
+            State(NAV_READY);
+            fixed_probe_phase = fixed_probe_phase == FIXED_PROBE_MOVE_SIDE ?
+                FIXED_PROBE_TURN_FORWARD : FIXED_PROBE_TURN_FORWARD_OTHER;
+            next_heading = fixed_probe_heading;
+            if (fabsf(remainderf(next_heading - MapYaw(), 360.0f)) <=
+                MOTION_ANGLE_TOLERANCE_DEG) {
+                fixed_probe_phase = FIXED_PROBE_CHECK;
+                fixed_probe_check_tick = front[1].tick;
+                return;
+            }
+            if (!StartHeadingTurn()) { Fail(NAV_MPU_FAULT); return; }
+            State(NAV_TURNING);
+            return;
+        }
+        return;
+    }
+    if (fixed_probe_phase == FIXED_PROBE_CHECK) {
+        if (front[1].tick == fixed_probe_check_tick) return;
+        bool side_view_fresh = FixedLineRangeFresh(&front[0], now) &&
+            FixedLineRangeFresh(&front[2], now);
+        /* A clear centre ray alone is not enough after a short sidestep: the
+         * body can still clip the corner of the box. Require both diagonals to
+         * clear before committing to the shifted waypoint line. */
+        if (front[1].mm > FIXED_LINE_FORWARD_CHECK_MM && side_view_fresh &&
+            front[0].mm > FIXED_LINE_FORWARD_CHECK_MM &&
+            front[2].mm > FIXED_LINE_FORWARD_CHECK_MM) {
+            fixed_line_offset = (uint8_t)FIXED_LINE_PROBE_MM;
+            fixed_line_avoid_dx = fixed_probe_side * sinf(fixed_probe_heading * DEG_RAD);
+            fixed_line_avoid_dy = -fixed_probe_side * cosf(fixed_probe_heading * DEG_RAD);
+            fixed_line_avoid_x = x;
+            fixed_line_avoid_y = y;
+            fixed_line_center_count = 0u;
+            fixed_probe_phase = FIXED_PROBE_IDLE;
+            fixed_line_pivot = false;
+            return;
+        }
+        if (!fixed_probe_attempts) {
+            int8_t other = (int8_t)-fixed_probe_side;
+            if (FixedLineProbeClear(other, fixed_probe_heading, x, y, true)) {
+                fixed_probe_attempts = 1u;
+                if (StartFixedLineProbe(other, true)) return;
+            }
+        }
+        Fail(NAV_SEARCH_BLOCKED);
+        return;
+    }
+
     unsigned count = COURSE_ROUTE_COUNT;
     if (fixed_line_point >= count) {
         pose_valid = false;
         Fail(y <= -(float)cfg.length_mm * 0.5f ? NAV_ARRIVED : NAV_POSE_LOST);
         return;
     }
+    /* The detour offset is a lateral vector applied to the aim point. Measure the
+     * waypoint capture against the shifted aim, so the point index advances at the
+     * normal rate while the car runs beside the table line; measuring against the
+     * raw point would either stall the index or skip it into the next corner. */
+    float ox = 0.0f, oy = 0.0f;
+    if (fixed_line_offset != 0u) {
+        ox = fixed_line_avoid_dx * fixed_line_offset;
+        oy = fixed_line_avoid_dy * fixed_line_offset;
+    }
     while (fixed_line_point + 1u < count &&
-           hypotf(course_route[fixed_line_point][0] - x,
-                  course_route[fixed_line_point][1] - y) < 45.0f)
+           hypotf(course_route[fixed_line_point][0] + ox - x,
+                  course_route[fixed_line_point][1] + oy - y) < 45.0f)
         ++fixed_line_point;
     const int16_t *point = course_route[fixed_line_point];
     route_leg = point[2] == 3 ? U_SOUTH : point[2] == 2 ? U_EAST : U_NORTH;
     nav_diag.route_leg = route_leg;
-    float tx = point[0], ty = point[1];
+    float tx = point[0] + ox, ty = point[1] + oy;
+    /* Start a detour only when a diagonal beam is very close while the centre
+     * beam is clear. The centre beam proves the lane ahead is open (so the car is
+     * not simply facing a wall), and the diagonal beam proves something sits
+     * beside the line, which is the case the centre beam cannot see. */
+    if (fixed_line_offset == 0u) {
+        uint32_t now = HAL_GetTick();
+        bool ranges_fresh = FixedLineRangeFresh(&front[0], now) &&
+            FixedLineRangeFresh(&front[1], now) &&
+            FixedLineRangeFresh(&front[2], now) &&
+            (int32_t)(front[0].tick - front[1].tick) >= -FIXED_LINE_TOF_SYNC_MS &&
+            (int32_t)(front[2].tick - front[1].tick) >= -FIXED_LINE_TOF_SYNC_MS;
+        if (ranges_fresh && front[1].mm >= FIXED_LINE_CENTRE_MM &&
+            (front[0].mm <= FIXED_LINE_SIDE_MM || front[2].mm <= FIXED_LINE_SIDE_MM)) {
+            /* Direction the car is about to travel: towards its current waypoint.
+             * The table segment cannot be used here because the point index runs
+             * ahead of the car on the diagonal, so "next - point" points east and
+             * the "left" normal would push the car north instead of west. */
+            float dirx = (float)point[0] - x;
+            float diry = (float)point[1] - y;
+            float dirlen = hypotf(dirx, diry);
+            if (dirlen < 1.0f) {
+                const int16_t *next = course_route[fixed_line_point + 1u < count ?
+                    fixed_line_point + 1u : fixed_line_point];
+                dirx = (float)(next[0] - point[0]);
+                diry = (float)(next[1] - point[1]);
+                dirlen = hypotf(dirx, diry);
+            }
+            if (dirlen < 1.0f) { dirx = 0.0f; diry = 1.0f; dirlen = 1.0f; }
+            dirx /= dirlen;
+            diry /= dirlen;
+            /* Left normal of the travel direction, flipped away from the obstacle. */
+            float sign = front[0].mm <= front[2].mm ? -1.0f : 1.0f;
+            fixed_line_avoid_dx = -diry * sign;
+            fixed_line_avoid_dy = dirx * sign;
+            fixed_line_offset = FIXED_LINE_OFFSET_MM;
+            fixed_line_avoid_x = x;
+            fixed_line_avoid_y = y;
+            /* Stop the rolling move so the pivot path can turn to the shifted
+             * aim: a rolling retarget only accepts a 14 deg change. */
+            fixed_line_pivot = true;
+        }
+    } else {
+        /* Hold the offset past the obstacle, then ramp it out so the car rejoins
+         * the waypoint line instead of stepping back in one jump. */
+        uint16_t travelled = (uint16_t)hypotf(x - fixed_line_avoid_x,
+                                               y - fixed_line_avoid_y);
+        if (travelled >= FIXED_LINE_HOLD_MM) {
+            fixed_line_offset = 0u;
+        } else if (travelled > FIXED_LINE_HOLD_MM - FIXED_LINE_RELEASE_MM) {
+            fixed_line_offset = FIXED_LINE_OFFSET_MM *
+                (FIXED_LINE_HOLD_MM - travelled) / FIXED_LINE_RELEASE_MM;
+        } else {
+            fixed_line_offset = FIXED_LINE_OFFSET_MM;
+        }
+    }
     float dx = tx - x, dy = ty - y;
     float remaining = hypotf(dx, dy);
-    if (fixed_line_point + 1u == count && remaining <= 8.0f) {
+    float goal_distance = hypotf((float)course_route[count - 1u][0] + ox - x,
+                                 (float)course_route[count - 1u][1] + oy - y);
+    if (fixed_line_point + 1u == count && goal_distance <= 8.0f) {
         Motion_Cancel();
         ++fixed_line_point;
         State(NAV_READY);
         return;
     }
-    if (state == NAV_MOVING && motion == MOTION_DONE) {
-        State(NAV_READY);
-        return;
-    }
     float bearing = atan2f(dy, dx) / DEG_RAD;
     float error = remainderf(bearing - MapYaw(), 360.0f);
+    if (fixed_line_offset == 0u && front[1].mm < FIXED_LINE_STOP_MM) {
+        if (front[1].tick != fixed_line_center_tick) {
+            fixed_line_center_count = fixed_line_center_count &&
+                front[1].tick - fixed_line_center_tick <= NAV_SENSOR_AGE_MS ?
+                (uint8_t)(fixed_line_center_count + 1u) : 1u;
+            fixed_line_center_tick = front[1].tick;
+        }
+        if (fixed_line_center_count >= 2u && BeginFixedLineProbe(bearing)) return;
+        /* Hold at the first fresh close sample while waiting for the second.
+         * Continuing the rolling move for one more ToF period lets the body
+         * swing into a frontal obstacle when the perpendicular probe begins. */
+        if (fixed_line_center_count == 1u && state == NAV_MOVING) {
+            Motion_Cancel();
+            State(NAV_READY);
+            return;
+        }
+    } else if (front[1].mm >= FIXED_LINE_STOP_MM) {
+        fixed_line_center_count = 0u;
+    }
+    if (state == NAV_MOVING) {
+        if (motion == MOTION_DONE) { State(NAV_READY); return; }
+        /* Keep rolling: retarget the move already running instead of stopping at
+         * every table point. The curve is dense (about 10-15 mm between points),
+         * so one distance command can cover the whole course continuously. */
+        if (fixed_line_pivot) {
+            fixed_line_pivot = false;
+            Motion_Cancel();
+            State(NAV_READY);
+            return;
+        }
+        if (Motion_RetargetForward(fminf(100.0f, remaining), bearing - yaw_offset)) return;
+        /* Bearing too far off to retarget: let this move finish, then pivot. */
+        return;
+    }
     if (fabsf(error) > MOTION_ANGLE_TOLERANCE_DEG) {
-        /* Return to the original stop-and-pivot behavior for fixed waypoints.
-         * Turn on the MPU heading first, then start the next forward segment. */
         next_heading = bearing;
         if (!StartHeadingTurn()) { Fail(NAV_MPU_FAULT); return; }
         State(NAV_TURNING);
@@ -1935,7 +2263,7 @@ static void UpdateNavigation(const NavigationRange front[3], int16_t speed)
             Fail(NAV_BORDER);
             return;
         }
-        FixedLineMove();
+        FixedLineMove(front);
         return;
     }
     if (reference_active && !reference_detour_active && local_step != LOCAL_ARC) {

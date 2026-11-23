@@ -173,10 +173,10 @@ int main(void)
     Command('L', 2810);
     UpdateMove(2810);
     assert(left_pwm == -PIVOT_PWM && right_pwm == PIVOT_PWM);
-    angle = 4.8f;
+    angle = 6.8f;
     UpdateMove(2860);
     assert(left_pwm == -PIVOT_PWM);
-    angle = 5.0f;
+    angle = 7.0f;
     UpdateMove(2900);
     assert(settling && left_pwm == 0 && cutoff == TAP_TURN_TENTHS);
     UpdateMove(2900 + SETTLE_MS);

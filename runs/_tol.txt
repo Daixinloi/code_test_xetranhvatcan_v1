@@ -1,0 +1,1 @@
+﻿motion.h:43: #define MOTION_ANGLE_TOLERANCE_DEG     2.0f

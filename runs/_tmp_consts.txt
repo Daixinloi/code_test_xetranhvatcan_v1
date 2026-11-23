@@ -1,0 +1,33 @@
+﻿27: #define U_FIELD_SOUTH_X_MM 1327
+28: #define U_FIELD_SOUTH_AFTER_T14_X_MM 1380
+42: #define U_LEFT_LANE_MM 600
+43: #define U_RIGHT_LANE_MM 1200
+87: #define FINISH_LANE_Y_MM 620.0f
+88: #define FINISH_BEAM_MM 118.0f    /* right-beam range for a 75 mm U-edge offset */
+89: #define FINISH_BEAM_SIN 0.42262f /* sin(25 deg) of the outer beam */
+128: static bool fixed_line_edge;   /* front-edge layer holds the finish corridor */
+129: static float fixed_line_aim;   /* lateral aim offset from the right ToF beam */
+268: if (route_leg == U_NORTH) return tx < U_LEFT_LANE_MM - pad &&
+272: return tx > U_RIGHT_LANE_MM + pad && tx <= U_SOUTH_LANE_MAX_X_MM;
+525: fixed_line_edge = false;
+526: fixed_line_aim = 0.0f;
+991: x < U_LEFT_LANE_MM && tx > U_T9_APPROACH_X_MM) return false;
+1566: float min_x = CenteredField() ? U_RIGHT_LANE_MM + map.turn_padding_mm + 1.0f :
+1567: U_FIELD_SOUTH_X_MM;
+1614: float east_end = U_FIELD_SOUTH_X_MM;
+1616: east_end = U_FIELD_SOUTH_AFTER_T14_X_MM;
+1796: (route_leg == U_EAST && x >= U_FIELD_SOUTH_X_MM - 2 && InLeg(x, y) &&
+1808: (route_leg == U_EAST && x >= U_FIELD_SOUTH_AFTER_T14_X_MM - 2 &&
+1909: if (route_leg == U_SOUTH && y < FINISH_LANE_Y_MM) {
+1911: fixed_line_aim = (FINISH_BEAM_MM - (float)front[2].mm) * FINISH_BEAM_SIN;
+1912: fixed_line_edge = true;
+1914: tx = x + fixed_line_aim;
+1916: fixed_line_edge = false;
+1917: fixed_line_aim = 0.0f;
+1964: (!fixed_line_edge && x > U_LEFT_LANE_MM - pad &&
+1965: x < U_RIGHT_LANE_MM + pad && y < 600.0f + pad)) {
+1974: if (x >= U_FIELD_SOUTH_AFTER_T14_X_MM || (x >= 1290.0f && y < 695.0f))
+1982: bool bottom_gate = (entry_pending && x < U_LEFT_LANE_MM - pad) ||
+1983: (finishing && route_leg == U_SOUTH && x > U_RIGHT_LANE_MM + pad);
+1990: x > U_LEFT_LANE_MM - center_pad && x < U_RIGHT_LANE_MM + center_pad)) {
+2155: entry_prefer_left = CenteredField() ? x >= U_LEFT_LANE_MM / 2 : front[0].mm > front[2].mm;

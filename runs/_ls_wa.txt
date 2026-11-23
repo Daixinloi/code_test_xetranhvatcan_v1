@@ -1,0 +1,14 @@
+﻿notes.md
+suite_compare.ps1
+suite_trigger_off_err.u8.txt
+suite_trigger_off_out.txt
+suite_trigger_on_err.u8.txt
+suite_trigger_on_out.txt
+sweep_offset_band.ps1
+sweep_offset_band.txt
+sweep_offset_hold.ps1
+sweep_offset_hold.txt
+trace_nominal.csv
+trace_t9.csv
+trigger_variants.ps1
+trigger_variants.txt

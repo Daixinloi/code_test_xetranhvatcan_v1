@@ -14,7 +14,7 @@ static const NavigationConfig navigation_config = {
 #ifdef NAV_TEST_START_X_MM
     .start_x_mm = NAV_TEST_START_X_MM,
 #else
-    .start_x_mm = 420, /* User-selected X = 42 cm. */
+    .start_x_mm = 300, /* User-selected X = 30 cm. */
 #endif
     .start_y_mm = -45, /* Nose on start line; centre is 4.5 cm outside. */
     .goal_x_mm = 1575, .goal_y_mm = 125,

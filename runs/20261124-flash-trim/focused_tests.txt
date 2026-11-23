@@ -1,0 +1,6 @@
+PASS: telemetry frame matches snprintf byte for byte, CRC and overflow unchanged
+text_format rc=0
+PASS: bounded reference calibration, init/start failures rejected, I2C errors preserved, partial samples rejected
+vl53l0x rc=0
+PASS: teach tap/hold, timeout, flash fallback, replay, T14 route, stop, stale MPU, field boundary
+teach rc=0

@@ -1,0 +1,69 @@
+﻿03-ngu-canh.md:1: # Ngữ cảnh bàn giao cho phiên làm việc mới
+03-ngu-canh.md:8: ### 2026-11-22 — Hạ nhẹ tuyến để né T11
+03-ngu-canh.md:13: ### 2026-11-22 — Dịch phải đích và hiệu chỉnh hướng khi xe đang chạy
+03-ngu-canh.md:20: ### 2026-11-22 — Cua xuống sớm/đụng vùng cấm trong ảnh mô phỏng
+03-ngu-canh.md:27: ### 2026-11-22 — Lỗi chuyển động khi vào cua, giảm flash tuyến
+03-ngu-canh.md:34: ### 2026-11-22 — Vệt vẫn đâm T11/T12 trong mô phỏng
+03-ngu-canh.md:41: ### 2026-11-22 — Trở lại quay tại chỗ trước khi tiến
+03-ngu-canh.md:48: ### 2026-11-22 — Khôi phục dừng rồi quay ở waypoint
+03-ngu-canh.md:53: ## Bàn giao phiên gần nhất
+03-ngu-canh.md:55: ### 2026-11-23 — Đã né được vật cản cục bộ ở T9 trong simulator (chưa nạp)
+03-ngu-canh.md:92: ### 2026-11-23 — Sửa lỗi tràn bảng tuyến và khôi phục chạy liên tục (đường trống đã đạt)
+03-ngu-canh.md:131: ### 2026-11-23 — Ứng viên ToF tránh dừng giả ở T9 (chưa nạp)
+03-ngu-canh.md:152: ### 2026-11-23 — Sửa quyền điều khiển né T9; bản cập nhật chờ kiểm tra nguồn
+03-ngu-canh.md:172: ### 2026-11-22 — Tối ưu flash: nén bảng tuyến sang cm (build xanh, 9/9 PASS)
+03-ngu-canh.md:201: ### 2026-11-22 — Thêm lớp né mép trước bằng ToF cho chặng xuống đích (đã build, chưa nạp)
+03-ngu-canh.md:285: ### 2026-11-22 — Nạp bản chặng cuối trái 27 mm thành công
+03-ngu-canh.md:294: ### 2026-11-22 — Nạp bản chặng cuối trái 27 mm thất bại
+03-ngu-canh.md:303: ### 2026-11-22 — chặng cuối trái 27 mm (X=1275), nới T11/T14, đã build chờ nạp
+03-ngu-canh.md:339: ### 2026-11-22 — hạ Y vùng T11/T14, chặng cuối trái 10 mm, đã nạp
+03-ngu-canh.md:441: ### 2026-11-22 — Tóm tắt ưu tiên cho chat mới
+03-ngu-canh.md:492: ### 2026-11-22 — Đã nạp Teach với V lưu và U phát lại
+03-ngu-canh.md:498: ### 2026-11-22 — Nạp và xác minh bản Teach ban đầu
+03-ngu-canh.md:504: ### 2026-11-22 — Bản thử lái tay, ghi và phát lại không dùng ToF
+03-ngu-canh.md:511: ### 2026-11-22 — Tái hiện nhánh dừng và sửa bản ghi chẩn đoán
+03-ngu-canh.md:525: ## Nơi làm việc và các phần chính
+03-ngu-canh.md:531: ## Cấu hình cần nhớ
+03-ngu-canh.md:545: ## Lệnh và quy trình quan sát
+03-ngu-canh.md:559: ## Trạng thái bàn giao và chỗ dễ nhầm
+03-ngu-canh.md:582: ### 2026-11-23 — Tái hiện lỗi simulator qua T9, chưa có bản sửa đạt
+03-ngu-canh.md:589: ### 2026-11-23 — `trace t9` đã qua vật cản và về đích trong simulator
+03-ngu-canh.md:595: ### 2026-11-23 — Đã build Release mới, nạp đang chờ nguồn bo an toàn
+03-ngu-canh.md:600: ### 2026-11-23 — Đã nạp Release tuyến qua T9
+03-ngu-canh.md:605: ### 2026-11-23 — Đã thay bản vòng lớn bằng tuyến mặc định + né ToF giữa
+03-ngu-canh.md:612: ### 2026-11-23 — Phiên tiếp theo: giữ waypoint, chưa hoàn tất tích hợp ToF
+04-nhat-ky-loi.md:1: # Nhật ký lỗi và cách sửa
+04-nhat-ky-loi.md:3: ## 2026-11-23 — Bảng tuyến tràn int8 và lệnh chạy bị phát lại mỗi vòng
+04-nhat-ky-loi.md:29: ## 2026-11-23 — Giữ tuyến waypoint, né ToF chưa xác nhận
+04-nhat-ky-loi.md:45: ## 2026-11-22 — Sau khi nạp Release, không có dữ liệu Bluetooth và xe không chạy
+04-nhat-ky-loi.md:57: ## 2026-11-22 — Xe thật đâm T15/T16 ở chặng cuối, xin dịch trái 7 cm
+04-nhat-ky-loi.md:120: ## 2026-11-22 — `Tools/plan_route.py` đo sai "tuyến hiện tại" (bảng cũ X=1300)
+04-nhat-ky-loi.md:139: ## 2026-11-22 — Chặng cuối chạm line, cần dịch phải 12 mm
+04-nhat-ky-loi.md:161: ## 2026-11-22 — Nạp bản cuối chat tuyến cong bị gián đoạn, ST-LINK mất kết nối USB
+04-nhat-ky-loi.md:170: ## 2026-11-22 — Vệt mới vẫn đâm vào T11
+04-nhat-ky-loi.md:177: ## 2026-11-22 — Đổi lại cua dừng rồi quay theo yêu cầu
+04-nhat-ky-loi.md:183: ## 2026-11-22 — Thử lại cách dừng rồi quay trước mỗi đoạn
+04-nhat-ky-loi.md:189: ## 2026-11-22 — PowerTech C/C++ báo kích hoạt không hợp lệ trong VS Code
+04-nhat-ky-loi.md:197: ## 2026-11-22 — Vệt mô phỏng vẫn cắt vào T11/T12
+04-nhat-ky-loi.md:203: ## 2026-11-22 — Lỗi chuyển động khi bắt đầu rẽ ở xe thật
+04-nhat-ky-loi.md:211: ## 2026-11-22 — Vệt mô phỏng cua xuống vào vùng giữa sân
+04-nhat-ky-loi.md:218: ## 2026-11-22 — Mô phỏng chặng cuối chạm vạch đích
+04-nhat-ky-loi.md:228: ## 2026-11-22 — Xe chạm nhẹ góc T12, T9 vừa đủ qua
+04-nhat-ky-loi.md:235: ## 2026-11-22 — Tuyến sửa tay đi sát T9 và mép trong ở đoạn xuống đích
+04-nhat-ky-loi.md:243: ## 2026-11-22 — Gửi Z rồi U nhưng xe không phát lại
+04-nhat-ky-loi.md:249: ## 2026-11-22 — Động cơ không chạy khi gửi lệnh lái Teach
+04-nhat-ky-loi.md:255: ## 2026-11-22 — Điện thoại hay mất kết nối Bluetooth với xe
+04-nhat-ky-loi.md:267: ## 2026-11-22 — ST-LINK báo điện áp 4,07 V khi đọc STM32
+04-nhat-ky-loi.md:281: ## 2026-11-22 — MPU chưa khởi tạo sau khi nạp Teach
+04-nhat-ky-loi.md:292: ## 2026-11-21 — Xe bắt đầu cua sau đoạn tới T7 rồi đứng yên
+04-nhat-ky-loi.md:309: ## 2026-11-22 — Xe chạm T11 sau khi hạ tuyến và dừng trước đích
+04-nhat-ky-loi.md:318: ## 2026-11-22 — Bật lớp ToF trên tuyến tham chiếu cố định
+04-nhat-ky-loi.md:326: ## 2026-11-22 — Chỉnh ngưỡng ToF theo thử nghiệm 3 cm
+04-nhat-ky-loi.md:333: ## 2026-11-22 — Hạ ngưỡng ToF chéo và tăng tốc đoạn thoáng
+04-nhat-ky-loi.md:340: ## 2026-11-22 — Người dùng xác nhận lượt xe vừa chạy chưa có ToF
+04-nhat-ky-loi.md:345: # 2026-11-23 — Xe dừng trước T9; ToF chéo phải bị dùng nhầm làm điều kiện dừng
+04-nhat-ky-loi.md:375: ## 2026-11-23 — Né T9 làm mất tuyến; cập nhật firmware chờ kiểm tra điện áp
+04-nhat-ky-loi.md:401: ## 2026-11-23 — Mô phỏng `trace t9` còn va chạm vật cản cục bộ
+04-nhat-ky-loi.md:408: ## 2026-11-23 — Điều chỉnh tuyến kiểm tra để qua hành lang T9
+04-nhat-ky-loi.md:416: ## 2026-11-23 — Release mới cho T9 đã build; chưa nạp vì điện áp ST-LINK cao
+04-nhat-ky-loi.md:424: ## 2026-11-23 — Khôi phục tuyến mặc định, chỉ né vật cản mới ở phía trước

@@ -1,0 +1,11 @@
+﻿[1/4] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/vl53l0x.c.obj
+[2/4] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/main.c.obj
+[3/4] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/navigation.c.obj
+[4/4] Linking C executable code_test_xetranhvatcan.elf; Building .hex and .bin for ST-Link flashing
+lto-wrapper.exe: warning: using serial compilation of 2 LTRANS jobs
+lto-wrapper.exe: note: see the '-flto' option documentation for more information
+Memory region         Used Size  Region Size  %age Used
+             RAM:       17632 B        20 KB     86.09%
+           FLASH:       63620 B        64 KB     97.08%
+   text	   data	    bss	    dec	    hex	filename
+  63372	    248	  17384	  81004	  13c6c	C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Debug/code_test_xetranhvatcan.elf

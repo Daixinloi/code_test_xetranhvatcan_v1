@@ -1,0 +1,69 @@
+﻿
+  Tests\sim_course.c:64:static void Run(const char *name, float scale, int slip_leg, float skid, 
+float random_scale,
+> Tests\sim_course.c:65:    unsigned seed, unsigned poll, FILE *trace)
+  Tests\sim_course.c:66:{
+  Tests\sim_course.c:67:    rng = seed;
+  Tests\sim_course.c:68:    tick = 0; yaw = 0; motion = MOTION_IDLE; encoder = 0; distance_commands 
+= 0; ready = true;
+  Tests\sim_course.c:136:        max_error = 
+fmaxf(max_error,hypotf(px-nav_diag.x_mm,py-nav_diag.y_mm));
+> Tests\sim_course.c:137:        if (trace && i % 5 == 0)
+> Tests\sim_course.c:138:            
+fprintf(trace,"%.2f,%.2f,%.2f,%lu,%lu,%ld,%ld,%u,%u,%u,%u,%.1f,%.3f,%.3f,%u\n",
+  Tests\sim_course.c:139:                px,py,physical_heading,
+  Tests\sim_course.c:140:                (unsigned long)nav_diag.route_leg,(unsigned 
+long)nav_diag.state,
+  Tests\sim_course.c:141:                
+(long)nav_diag.x_mm,(long)nav_diag.y_mm,front[0].mm,front[1].mm,front[2].mm,
+  Tests\sim_course.c:148:            !strcmp(name, "systematic_5pct")) CHECK(!contact);
+> Tests\sim_course.c:149:        if (contact) { if (getenv("SLIP_DIAG")) fprintf(stderr,"CONTACT %s 
+%s st=%u heading=%.1f tof=%u/%u/%u 
+local=%u\n",name,contact,state,angle/radians,front[0].mm,front[1].mm,front[2].mm,local_step); 
+outcome = contact; break; }
+  Tests\sim_course.c:150:        if (nav_diag.state == NAV_ARRIVED) {
+  Tests\sim_course.c:151:            float reach = 45*(fabsf(cosf(angle))+fabsf(sinf(angle)));
+  Tests\sim_course.c:152:            outcome = py + reach <= 0 && px - reach >= 1200 && px + reach 
+<= 1800 ? "finish" : "short_finish";
+  Tests\sim_course.c:155:        if (!Navigation_IsActive()) { outcome = state == NAV_BORDER ? 
+"border_stop" : "firmware_fault"; break; }
+> Tests\sim_course.c:156:        if (tick-last_move > 12000) { outcome = "stuck"; if 
+(getenv("SLIP_DIAG")) fprintf(stderr, "%s st=%u local=%u next=%.8f center=%u left=%u right=%u 
+goal=%.5f,%.5f x=%.5f,%.5f moving=%u sides=%d,%d blocked=%d retreat=%u yaw=%.3f tail=%.2f/%.2f backt
+racked=%d\n",name,state,local_step,next_distance,front[1].mm,front[0].mm,front[2].mm,local_x,local_y
+,x,y,motion,side_blocked,tried_other_side,prefer_lateral,nav_diag.retreats,yaw+90,tail_mm,tail_headi
+ng,backtracked); break; }
+  Tests\sim_course.c:157:    }
+  Tests\sim_course.c:158:    if (!strcmp(name, "first_bend"))
+  Tests\sim_course.c:159:        CHECK(first_bend_y >= 630.0f && first_bend_y <= 690.0f && 
+!strcmp(outcome, "finish"));
+  Tests\sim_course.c:209:    CHECK(state == NAV_WAIT_CLEARANCE && nav_diag.near_front_mask == 1u && 
+reference_active);
+> Tests\sim_course.c:210:    unsigned trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+> Tests\sim_course.c:211:    CHECK(nav_trace[trace].state == NAV_WAIT_CLEARANCE && 
+nav_trace[trace].front_mm[0] == 24);
+  Tests\sim_course.c:212:    tick += 40;
+  Tests\sim_course.c:213:    Fresh(front);
+  Tests\sim_course.c:214:    front[1].mm = 40;
+  Tests\sim_course.c:219:    Navigation_Update(front, 420);
+> Tests\sim_course.c:220:    trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+> Tests\sim_course.c:221:    CHECK(nav_trace[trace].state == NAV_MPU_FAULT && 
+nav_trace[trace].front_mm[1] == 40);
+  Tests\sim_course.c:222:    ready = true;
+  Tests\sim_course.c:223:}
+  Tests\sim_course.c:224:
+  Tests\sim_course.c:239:        CHECK(!Navigation_IsActive() && nav_diag.state == NAV_BORDER);
+> Tests\sim_course.c:240:        CHECK(nav_trace_count == 1 && nav_trace[0].state == NAV_BORDER);
+> Tests\sim_course.c:241:        CHECK(nav_trace[0].front_mm[1] == front[1].mm);
+  Tests\sim_course.c:242:    }
+  Tests\sim_course.c:243:}
+  Tests\sim_course.c:244:
+  Tests\sim_course.c:513:    t3_removed = argc > 2 && !strcmp(argv[2], "removed3");
+> Tests\sim_course.c:514:    if (argc == 3 && !strcmp(argv[1], "trace")) {
+  Tests\sim_course.c:515:        reflect_walls = false;
+  Tests\sim_course.c:516:        /* The hand-tuned course has 90-degree corners that the steering 
+model
+  Tests\sim_course.c:517:         * cannot follow continuously (1.5 deg per 10 ms tick, 0.8 mm per 
+tick),
+
+

@@ -1,0 +1,10 @@
+﻿main.c:301: snprintf(msg, sizeof(msg), "ToF: %u/5\r\n", count_ok);
+main.c:479: snprintf(ranges[i], sizeof(ranges[i]), "%u", cb[i].dist);
+main.c:482: Navigation_IsActive() ? Navigation_GetLabel() : Get_Action_Name(current_action),
+main.c:1101: motion_error = Navigation_GetLabel();
+main.c:1128: motion_error = Navigation_GetLabel();
+main.c:1224: motion_error = Navigation_GetLabel();
+navigation.c:2445: const char *Navigation_GetLabel(void)
+syscalls.c:218: // Picolibc uses these pointers for standard I/O operations (printf, scanf, etc.).
+teach_drive.c:354: snprintf(saved_notice, sizeof(saved_notice), "DA_LUU:ID%lu:SEG%u",
+teach_drive.c:388: snprintf(action, sizeof(action), "%s:%c",

@@ -298,7 +298,12 @@ void Run_Full_Initialization(void)
     count_ok++;
   }
 
-  snprintf(msg, sizeof(msg), "ToF: %u/5\r\n", count_ok);
+  TextWriter text;
+  Text_Init(&text, msg, sizeof(msg));
+  Text_String(&text, "ToF: ");
+  Text_UInt(&text, count_ok);
+  Text_String(&text, "/5\r\n");
+  Text_Finish(&text);
   SoftUART_TransmitString(msg);
 
   /* Initialize the actual MPU6500 as well as MPU6050, then calibrate. */
@@ -476,7 +481,12 @@ static void Format_Status(char *buffer, size_t size)
     if (!cb[i].ok || cb[i].dist >= 8000)
       strcpy(ranges[i], "---");
     else
-      snprintf(ranges[i], sizeof(ranges[i]), "%u", cb[i].dist);
+    {
+      TextWriter range;
+      Text_Init(&range, ranges[i], sizeof(ranges[i]));
+      Text_UInt(&range, cb[i].dist);
+      Text_Finish(&range);
+    }
   }
   BluetoothStatus_Format(buffer, size, mpu_ok, yaw_angle, ranges,
                          Navigation_IsActive() ? Navigation_GetLabel() : Get_Action_Name(current_action),
@@ -712,6 +722,11 @@ static bool Service_Front_Clearance(void)
     }
     return false;
   }
+  /* While autonomous navigation is active, its waypoint/local-avoidance
+   * controller owns the pose and ToF response. The manual retreat guard below
+   * cancels odometry and would prevent returning to the saved course. */
+  if (Navigation_IsActive())
+    return false;
   int16_t encoder = Encoder_GetCount2();
   ClearanceOutput out = FrontClearance_Update(&clearance, now, front, encoder, encoder);
   if (!out.override && !clearance_active)
@@ -957,6 +972,11 @@ int main(void)
   Navigation_Init(&navigation_config);
   /* 3. Khoi tao 5x ToF va MPU-6050 */
   Run_Full_Initialization();
+  /* A transient I2C/MPU startup failure must enter the same bounded recovery
+   * path used for runtime read failures; otherwise motion stays locked until
+   * the board is power-cycled even after the bus becomes available. */
+  if (!mpu_ok)
+    Request_I2C_Recovery(HAL_I2C_GetError(&hi2c2));
 
   /* USER CODE END 2 */
 

@@ -1,0 +1,22 @@
+main.c:1120: if (floor_test || navigation_config.route_u)
+navigation.c:201: return cfg.route_u && cfg.start_x_mm == COURSE_ROUTE_START_X_MM && cfg.start_y_mm == -45;
+navigation.c:214: return cfg.route_u && (!empty_floor_test || CenteredField());
+navigation.c:378: if (cfg.route_u) Grid_SetMiddleClearance(&map, U_MIDDLE_CLEARANCE_MM);
+navigation.c:433: if (!cfg.route_u || route_leg == U_NORTH) return 1;
+navigation.c:440: if (!cfg.route_u) return Grid_Cell(cfg.goal_x_mm, cfg.goal_y_mm);
+navigation.c:453: unsigned count = cfg.route_u && !empty_floor_test ? 2 * U_ENTRY_CHOICES : 1;
+navigation.c:490: uint8_t min_row = cfg.route_u && route_leg == U_EAST ? U_NORTH_GATE_Y_MM / GRID_CELL_MM : 0;
+navigation.c:498: Fail(cfg.route_u && route_leg == U_SOUTH ? NAV_EXIT_BLOCKED : NAV_NO_PATH);
+navigation.c:514: fixed_line_course = COURSE_FIXED_LINE_TEST && cfg.route_u &&
+navigation.c:541: if (cfg.route_u && (!test || CenteredField())) {
+navigation.c:665: if ((!cfg.route_u || confirmed) && Grid_AddHit(&map, hit_x, hit_y)) {
+navigation.c:834: if (cfg.route_u) TryRetreat(front, near, now);
+navigation.c:1989: if ((empty_floor_test || cfg.route_u) && front[i].no_echo &&
+navigation.c:2082: if ((empty_floor_test || cfg.route_u) && (near || clearance_paused) && !can_turn_away) {
+navigation.c:2147: if (cfg.route_u && ++goal_choice < GoalChoices()) Plan();
+navigation.c:2148: else if (cfg.route_u && !entry_pending && !narrow_detour) {
+navigation.c:2240: if (!cfg.route_u) { Fail(NAV_ARRIVED); return; }
+navigation.c:2301: int16_t tolerance = cfg.route_u && cfg.position_margin_mm >= U_TRACKING_TOLERANCE_MM ?
+navigation.c:2430: if (cfg.route_u && state == NAV_MOVING) {
+navigation.h:11: bool route_u;
+navigation_config.h:9: .route_u = true,

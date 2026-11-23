@@ -1,0 +1,8 @@
+points           : 71
+leg changes at   : [14, 69] (legs [1, 2, 3])
+worst rounding   : 5 mm
+x_cm range       : 42 .. 128  (uint8 0..255)
+y_cm range       : -7 .. 90  (int8 -128..127)
+flash            : 426 B -> 142 B (saves 284 B)
+RAM expanded copy: +426 B
+

@@ -1,0 +1,2 @@
+﻿_v2_nom.txt rows=288 detourRows=0 maxOffset=0
+_v2_t9.txt rows=304 detourRows=84 maxOffset=35

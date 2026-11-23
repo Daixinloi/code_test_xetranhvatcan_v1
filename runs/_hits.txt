@@ -1,0 +1,13 @@
+﻿85: #define FIXED_LINE_BLOCK_MM 260.0f
+86: #define FIXED_LINE_OFFSET_MM 70.0f
+128: static float fixed_line_offset;
+522: fixed_line_course = COURSE_FIXED_LINE_TEST && cfg.route_u &&
+525: fixed_line_offset = 0.0f;
+1123: static bool PreferRight(const NavigationRange front[3])
+1254: float first_side = PreferRight(front) ? -1.0f : 1.0f;
+1657: if (!detour_step && !PreferRight(front) && cfg.start_x_mm == COURSE_ROUTE_START_X_MM && route_leg == U_EAST &&
+1664: if (!detour_step && (!CenteredField() || !PreferRight(front)) && route_leg == U_EAST &&
+1675: detour_step = PreferRight(front) == same_side ? -left : left;
+1867: static void FixedLineMove(const NavigationRange front[3])
+1908: (void)fixed_line_offset;
+1957: FixedLineMove(front);

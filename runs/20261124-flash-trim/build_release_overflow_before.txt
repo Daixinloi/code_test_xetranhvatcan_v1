@@ -1,0 +1,33 @@
+﻿[0/1] Re-running CMake...
+Build type: Release
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release
+[1/18] Building ASM object CMakeFiles/code_test_xetranhvatcan.dir/startup_stm32f103xb.s.obj
+[2/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/stm32f1xx_it.c.obj
+[3/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/stm32f1xx_hal_msp.c.obj
+[4/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/sysmem.c.obj
+[5/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/front_clearance.c.obj
+[6/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/motor_bench.c.obj
+[7/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/vl53l0x.c.obj
+[8/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/software_uart.c.obj
+[9/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/motor.c.obj
+[10/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/board_drive.c.obj
+[11/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/mpu6050.c.obj
+[12/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/syscalls.c.obj
+[13/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/main.c.obj
+[14/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/motion.c.obj
+[15/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/grid_map.c.obj
+[16/18] Building C object CMakeFiles/code_test_xetranhvatcan.dir/Src/navigation.c.obj
+[17/18] Linking C executable code_test_xetranhvatcan.elf; Building .hex and .bin for ST-Link flashing
+FAILED: [code=1] code_test_xetranhvatcan.elf 
+C:\WINDOWS\system32\cmd.exe /C "cd . && C:\ST\STM32CubeIDE_2.2.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740\tools\bin\arm-none-eabi-gcc.exe -mcpu=cortex-m3  -Wall -fdata-sections -ffunction-sections -fstack-usage -Os -g0 -flto=auto -fno-fat-lto-objects -mcpu=cortex-m3  -T "C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/STM32F103xx_FLASH.ld" --specs=nano.specs -Wl,-Map=code_test_xetranhvatcan.map -Wl,--gc-sections -Wl,--print-memory-usage cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Src/system_stm32f1xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/main.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/stm32f1xx_it.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/stm32f1xx_hal_msp.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/sysmem.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/syscalls.c.obj CMakeFiles/code_test_xetranhvatcan.dir/startup_stm32f103xb.s.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/software_uart.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/vl53l0x.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/motor.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/board_drive.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/motor_bench.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/mpu6050.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/motion.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/front_clearance.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/grid_map.c.obj CMakeFiles/code_test_xetranhvatcan.dir/Src/navigation.c.obj -o code_test_xetranhvatcan.elf  -lm  -lm && C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\daitr\Downloads\code_test_xetranhvatcan_v1\code_test_xetranhvatcan\build\Release && arm-none-eabi-objcopy -O ihex C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release/code_test_xetranhvatcan.elf C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release/code_test_xetranhvatcan.hex && arm-none-eabi-objcopy -O binary C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release/code_test_xetranhvatcan.elf C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release/code_test_xetranhvatcan.bin && arm-none-eabi-size C:/Users/daitr/Downloads/code_test_xetranhvatcan_v1/code_test_xetranhvatcan/build/Release/code_test_xetranhvatcan.elf""
+lto-wrapper.exe: warning: using serial compilation of 2 LTRANS jobs
+lto-wrapper.exe: note: see the '-flto' option documentation for more information
+C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/bin/ld.exe: code_test_xetranhvatcan.elf section `.data' will not fit in region `FLASH'
+C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/bin/ld.exe: region `FLASH' overflowed by 16 bytes
+Memory region         Used Size  Region Size  %age Used
+             RAM:       17640 B        20 KB     86.13%
+           FLASH:       65552 B        64 KB    100.02%
+collect2.exe: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

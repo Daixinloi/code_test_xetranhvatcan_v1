@@ -1,0 +1,17 @@
+﻿
+Name                         Length LastWriteTime        
+----                         ------ -------------        
+notes.md                       5701 11/23/2026 7:31:40 AM
+suite_compare.ps1              2170 11/23/2026 7:23:14 AM
+suite_trigger_off_err.u8.txt    596 11/23/2026 7:23:53 AM
+suite_trigger_off_out.txt         0 11/23/2026 7:23:32 AM
+suite_trigger_on_err.u8.txt     594 11/23/2026 7:23:53 AM
+suite_trigger_on_out.txt          0 11/23/2026 7:23:31 AM
+sweep_offset_band.ps1          1801 11/23/2026 7:12:49 AM
+sweep_offset_band.txt          1091 11/23/2026 7:13:09 AM
+sweep_offset_hold.ps1          2197 11/23/2026 7:12:04 AM
+sweep_offset_hold.txt          1314 11/23/2026 7:12:27 AM
+trace_nominal.csv             19716 11/23/2026 7:24:48 AM
+trace_t9.csv                  21069 11/23/2026 7:24:48 AM
+
+

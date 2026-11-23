@@ -1,0 +1,5 @@
+﻿replaced 20 lines with 34 lines
+flash 426 B -> 142 B (saves 284 B); RAM +426 B
+points checked  : 71
+worst axis error: 5 mm
+finish point    : (1280, -70) (was (1275, -65))

@@ -1,0 +1,38 @@
+65:     unsigned seed, unsigned poll, FILE *trace)
+137:         if (trace && i % 5 == 0)
+138:             fprintf(trace,"%.2f,%.2f,%.2f,%lu,%lu,%ld,%ld,%u,%u,%u,%u,%.1f,%.3f,%.3f,%u\n",
+210:     unsigned trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+211:     CHECK(nav_trace[trace].state == NAV_WAIT_CLEARANCE && nav_trace[trace].front_mm[0] == 24);
+220:     trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+221:     CHECK(nav_trace[trace].state == NAV_MPU_FAULT && nav_trace[trace].front_mm[1] == 40);
+240:         CHECK(nav_trace_count == 1 && nav_trace[0].state == NAV_BORDER);
+241:         CHECK(nav_trace[0].front_mm[1] == front[1].mm);
+475:     FILE *p = fopen("build/slip_nominal.csv","w");
+509: int main(int argc, char **argv)
+511:     reflect_walls = argc <= 1 || strcmp(argv[1], "lines");
+512:     t9_removed = argc > 2 && !strcmp(argv[2], "removed");
+513:     t3_removed = argc > 2 && !strcmp(argv[2], "removed3");
+514:     if (argc == 3 && !strcmp(argv[1], "trace")) {
+523:         if (!strcmp(argv[2], "nominal")) Run("nominal",1,-1,0,0,0,0,stdout);
+524:         else if (!strcmp(argv[2], "fast_first_curve")) {
+529:         else if (!strcmp(argv[2], "slip")) Run("slip",1,2,5,0,0,0,stdout);
+530:         else if (!strcmp(argv[2], "first_bend")) {
+534:         } else if (!strcmp(argv[2], "first_bend_old")) {
+538:         else if (!strcmp(argv[2], "north_short")) {
+541:         } else if (!strcmp(argv[2], "t9_short")) {
+544:         } else if (!strcmp(argv[2], "start_yaw_error")) {
+547:         } else if (!strncmp(argv[2], "arc_before", 10)) {
+550:             simulated_steering_lag = !strcmp(argv[2], "arc_before_lag");
+551:             Run(argv[2],1.0f,-1,0,0,0,4,stdout);
+552:         } else if (!strcmp(argv[2], "curve_lag")) {
+556:         else if (!strcmp(argv[2], "edge")) Run("edge",1.05f,-1,0,0,0,4,stdout);
+557:         else if (!strcmp(argv[2], "extra")) {
+561:         } else if (!strcmp(argv[2], "south")) {
+565:         } else if (!strcmp(argv[2], "join")) {
+569:         } else if (!strcmp(argv[2], "t9")) {
+573:         } else if (!strcmp(argv[2], "t11")) {
+577:         } else if (!strcmp(argv[2], "t14") || !strcmp(argv[2], "t14_lag")) {
+578:             simulated_steering_lag = !strcmp(argv[2], "t14_lag");
+581:             Run(argv[2],1,-1,0,0,0,4,stdout);
+582:         } else if (!strcmp(argv[2], "heading_recovery")) {
+585:         } else if (!strcmp(argv[2], "reference_detour")) {

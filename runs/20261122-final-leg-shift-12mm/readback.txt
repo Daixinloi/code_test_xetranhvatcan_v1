@@ -1,0 +1,26 @@
+      -------------------------------------------------------------------
+                       STM32CubeProgrammer v2.23.0                  
+      -------------------------------------------------------------------
+
+ST-LINK SN  : 37FF71064E573436E9171343
+ST-LINK FW  : V2J48S7
+Board       : --
+Voltage     : 3.27V
+SWD freq    : 100 KHz
+Connect mode: Under Reset
+Reset mode  : Hardware reset
+Device ID   : 0x410
+Revision ID : Rev X
+Device name : STM32F101/F102/F103 Medium-density
+NVM size    : 64 KBytes
+Device type : MCU
+Device CPU  : Cortex-M3
+BL Version  : --
+
+
+Reading 32-bit memory content
+  Size          : 8 Bytes
+  Address:      : 0x08000000
+0x08000000 : 20005000 0800CD65
+
+

@@ -1,0 +1,4 @@
+﻿sha=778040597E0D4589400CA0F3ED53C7981A14CADD240E3D94CD5606B97B311CBD
+11/22/2026 21:41:46 code_test_xetranhvatcan.hex 184320
+11/22/2026 21:41:46 code_test_xetranhvatcan.bin 65504
+11/22/2026 21:41:46 code_test_xetranhvatcan.elf 174936

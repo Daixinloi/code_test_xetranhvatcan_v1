@@ -1,0 +1,2 @@
+﻿PASS: teach tap/hold, timeout, flash fallback, replay, T14 route, stop, stale MPU, field boundary
+PASS: bounded reference calibration, init/start failures rejected, I2C errors preserved, partial samples rejected

@@ -1,0 +1,10 @@
+﻿
+Name                        LastWriteTime         Length
+----                        -------------         ------
+navigation.c                11/23/2026 7:13:28 AM 106230
+course_route.h              11/23/2026 1:42:35 AM   2119
+sim_course.c                11/23/2026 7:24:35 AM  25061
+code_test_xetranhvatcan.hex 11/23/2026 7:18:26 AM 184423
+code_test_xetranhvatcan.elf 11/23/2026 7:18:26 AM 175284
+
+

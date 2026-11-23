@@ -1,0 +1,2 @@
+﻿zeroDataLines=5
+zeroDataBytes=68

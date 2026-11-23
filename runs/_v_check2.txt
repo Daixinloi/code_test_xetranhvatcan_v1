@@ -1,0 +1,2 @@
+﻿_v_nom.txt rows=288 offNonZero=0 maxOff=0
+_v_t9.txt rows=304 offNonZero=84 maxOff=35

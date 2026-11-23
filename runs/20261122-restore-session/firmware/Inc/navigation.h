@@ -48,6 +48,7 @@ void Navigation_Cancel(void);
 void Navigation_InvalidatePose(void);
 void Navigation_Update(const NavigationRange front[3], int16_t speed);
 bool Navigation_IsActive(void);
+bool Navigation_UsesCenteredField(void);
 const char *Navigation_GetLabel(void);
 const GridMap *Navigation_GetMap(void);
 /* World projection also exposed for calibration checks without moving motors. */

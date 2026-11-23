@@ -36,7 +36,7 @@ int main(void)
     }
 
     FrontClearance g = {0};
-    ClearanceReading f[3] = {{20, true}, {35, true}, {0, false}};
+    ClearanceReading f[3] = {{20, true}, {25, true}, {0, false}};
     CHECK(Update(&g, 0, f).override);
     f[0].mm = 80;
     CHECK(Update(&g, 50, f).reverse_pwm > 0); /* middle is still too close */
@@ -45,7 +45,7 @@ int main(void)
     CHECK(Update(&g, 180, f).state == CLEARANCE_DONE);
 
     FrontClearance_Rearm(&g);
-    f[0].mm = 20;
+    f[0].mm = 19;
     Update(&g, 200, f);
     f[0].valid = false;
     CHECK(Update(&g, 250, f).state == CLEARANCE_SENSOR_FAULT);
@@ -86,7 +86,7 @@ int main(void)
     Update(&g, 50, f);
     f[0].mm = 55;
     CHECK(!Update(&g, 70, f).reverse_pwm); /* no chatter in 50-70 mm band */
-    f[0].mm = 25;
+    f[0].mm = 19;
     CHECK(Update(&g, 90, f).state == CLEARANCE_BRAKE);
     CHECK(Update(&g, 140, f).reverse_pwm > 0);
 
@@ -94,12 +94,12 @@ int main(void)
     f[0] = (ClearanceReading){50, true};
     f[1] = (ClearanceReading){50, true};
     f[2] = (ClearanceReading){50, true};
-    CHECK(!Update(&g, 0, f).override); /* all three use the same 5 cm boundary */
-    f[1].mm = 49;
-    CHECK(Update(&g, 10, f).override); /* center still protects 5 cm */
+    CHECK(!Update(&g, 0, f).override); /* diagonals use 2 cm, center uses 3 cm */
+    f[1].mm = 29;
+    CHECK(Update(&g, 10, f).override); /* center begins protection below 3 cm */
 
     FrontClearance_Rearm(&g);
-    f[0]=(ClearanceReading){20,true};
+    f[0]=(ClearanceReading){19,true};
     f[1]=f[2]=(ClearanceReading){200,true};
     Update(&g,0,f);Update(&g,41,f);
     f[0].valid=false;

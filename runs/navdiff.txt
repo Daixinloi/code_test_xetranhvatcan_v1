@@ -1,0 +1,60 @@
+﻿diff --git a/code_test_xetranhvatcan/Src/navigation.c b/runs/20261122-restore-session/firmware/Src/navigation.c
+index 0239a49..a0bd97c 100644
+--- a/code_test_xetranhvatcan/Src/navigation.c
++++ b/runs/20261122-restore-session/firmware/Src/navigation.c
+@@ -382,5 +382,4 @@ static void InitMap(uint16_t padding)
+ void Navigation_Init(const NavigationConfig *config)
+ {
+-    CourseRoute_Init();
+     memset((void *)&nav_diag, 0, sizeof(nav_diag));
+     cfg = *config;
+@@ -1215,5 +1214,5 @@ static bool ArcSectionClear(float begin, float end)
+ static bool FindArcMerge(unsigned range, uint32_t start)
+ {
+-    unsigned count = COURSE_ROUTE_COUNT;
++    unsigned count = sizeof(course_route) / sizeof(course_route[0]);
+     for (unsigned i = reference_point; i + 1 < count && HAL_GetTick() - start < 20u; ++i) {
+         float dx = course_route[i][0] - arc.x, dy = course_route[i][1] - arc.y;
+@@ -1326,5 +1325,5 @@ static bool BeginReferenceDetour(unsigned first_point)
+     uint8_t min_row = NorthCorner() ? start / GRID_WIDTH :
+         route_leg == U_EAST ? U_NORTH_GATE_Y_MM / GRID_CELL_MM : 0;
+-    unsigned count = COURSE_ROUTE_COUNT;
++    unsigned count = sizeof(course_route) / sizeof(course_route[0]);
+     for (unsigned point = first_point; point < count; ++point) {
+         uint16_t goal = Grid_Cell(course_route[point][0], course_route[point][1]);
+@@ -1480,5 +1479,5 @@ static void ExtendReference(const NavigationRange front[3])
+         return;
+ 
+-    bool exit = route_leg == U_SOUTH && reference_point + 1u == COURSE_ROUTE_COUNT &&
++    bool exit = route_leg == U_SOUTH && reference_point + 1u == (sizeof(course_route) / sizeof(course_route[0])) &&
+         y <= cfg.goal_y_mm + 35.0f && FieldExitClear();
+     float room = fminf(100.0f, ForwardRoom(front));
+@@ -1508,5 +1507,5 @@ static bool TryReference(const NavigationRange front[3], uint32_t near)
+ {
+     if (!reference_active) return false;
+-    while (reference_point < COURSE_ROUTE_COUNT) {
++    while (reference_point < (sizeof(course_route) / sizeof(course_route[0]))) {
+         float tx = course_route[reference_point][0], ty = course_route[reference_point][1];
+         float dx = tx - x, dy = ty - y;
+@@ -1877,5 +1876,5 @@ static void FixedLineMove(void)
+     if (state != NAV_READY && state != NAV_MOVING) return;
+ 
+-    unsigned count = COURSE_ROUTE_COUNT;
++    unsigned count = sizeof(course_route) / sizeof(course_route[0]);
+     if (fixed_line_point >= count) {
+         pose_valid = false;
+@@ -1904,8 +1903,10 @@ static void FixedLineMove(void)
+     }
+     float bearing = atan2f(dy, dx) / DEG_RAD;
+-    float error = remainderf(bearing - MapYaw(), 360.0f);
+-    if (fabsf(error) > MOTION_ANGLE_TOLERANCE_DEG) {
+-        /* Return to the original stop-and-pivot behavior for fixed waypoints.
+-         * Turn on the MPU heading first, then start the next forward segment. */
++    if (state == NAV_MOVING) {
++        Motion_RetargetForward(fminf(100.0f, remaining), bearing - yaw_offset);
++        return;
++    }
++    if (fabsf(remainderf(bearing - MapYaw(), 360.0f)) >
++        MOTION_ANGLE_TOLERANCE_DEG) {
+         next_heading = bearing;
+         if (!StartHeadingTurn()) { Fail(NAV_MPU_FAULT); return; }

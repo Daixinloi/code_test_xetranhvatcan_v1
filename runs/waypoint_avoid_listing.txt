@@ -1,0 +1,19 @@
+﻿
+Name                         Length
+----                         ------
+notes.md                       5701
+suite_compare.ps1              2170
+suite_trigger_off_err.u8.txt    596
+suite_trigger_off_out.txt         0
+suite_trigger_on_err.u8.txt     594
+suite_trigger_on_out.txt          0
+sweep_offset_band.ps1          1801
+sweep_offset_band.txt          1091
+sweep_offset_hold.ps1          2197
+sweep_offset_hold.txt          1314
+trace_nominal.csv             19716
+trace_t9.csv                  21069
+trigger_variants.ps1           2109
+trigger_variants.txt            512
+
+

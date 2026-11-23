@@ -1,0 +1,4 @@
+﻿dataBytes=65536
+minAddr=0
+maxAddr=65535
+span=65536

@@ -15,6 +15,10 @@ Release/
 MDK-ARM/**/Objects/
 MDK-ARM/**/Listings/
 
+# Python cache (Tools/*.py)
+__pycache__/
+*.pyc
+
 # IDE / editor
 .vs/
 *.user

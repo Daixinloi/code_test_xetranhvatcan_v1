@@ -1,0 +1,20 @@
+﻿--- validate inflate 0 (raw boxes) ---
+inflation 0 mm, middle extra 0 mm (middle block inflated by 0 mm)
+current route: 73 points, length 1899.8 mm, min clearance 71.8 mm
+  points inside an inflated obstacle: 0
+  segments crossing an inflated obstacle: 0
+--- validate inflate 45 ---
+inflation 45 mm, middle extra 0 mm (middle block inflated by 45 mm)
+current route: 73 points, length 1899.8 mm, min clearance 12.1 mm
+  points inside an inflated obstacle: 0
+  segments crossing an inflated obstacle: 0
+--- plan inflate 45 ---
+inflation 45 mm, middle extra 0 mm (middle block inflated by 45 mm)
+  raw A* path: 219 nodes, 2345.7 mm
+  after line-of-sight shortcut: 9 points, 2247.1 mm
+planned route: 153 points, length 2357.1 mm, min clearance -1.0 mm
+  points inside an inflated obstacle: 0
+  segments crossing an inflated obstacle: 2
+    (550.0, 840.0) -> (560.0, 850.0)
+    (1240.0, 650.0) -> (1250.0, 640.0)
+  vs current: +457.3 mm

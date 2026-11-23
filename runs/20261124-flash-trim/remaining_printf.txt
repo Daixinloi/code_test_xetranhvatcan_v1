@@ -1,0 +1,5 @@
+teach_drive.c:355: snprintf(saved_notice, sizeof(saved_notice), "DA_LUU:ID%lu:SEG%u",
+teach_drive.c:389: snprintf(action, sizeof(action), "%s:%c",
+bluetooth_status.h:51: /* C?n ?? 5 byte cho "*XX\r\n"; thi?u ch? th? b? c? khung nh? b?n snprintf. */
+text_format.h:9: * ??ng v? m?t k? t? hex, n?n kh?ng c?n k?o c? snprintf/newlib stdio v?o flash.
+text_format.h:10: * Chu?i t?o ra gi?ng h?t snprintf("%u"), ("%d"), ("%02X") trong c?c tr??ng h?p

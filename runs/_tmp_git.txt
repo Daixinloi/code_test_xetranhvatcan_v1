@@ -1,0 +1,146 @@
+﻿ M code_test_xetranhvatcan/Inc/course_route.h
+ M code_test_xetranhvatcan/Src/main.c
+ M code_test_xetranhvatcan/Src/navigation.c
+ M code_test_xetranhvatcan/Tests/sim_course.c
+ M docs/02-dinh-huong-giai-quyet.md
+ M docs/03-ngu-canh.md
+ M docs/04-nhat-ky-loi.md
+ M runs/20261122-restore-session/firmware/Inc/course_route.h
+ M runs/20261122-restore-session/firmware/Inc/front_clearance.h
+ M runs/20261122-restore-session/firmware/Inc/navigation.h
+ M runs/20261122-restore-session/firmware/Src/main.c
+ M runs/20261122-restore-session/firmware/Src/navigation.c
+ M runs/20261122-restore-session/firmware/Tests/sim_course.c
+ M runs/20261122-restore-session/firmware/Tests/test_front_clearance.c
+ M runs/20261122-restore-session/firmware/Tests/test_navigation.c
+ M runs/20261122-restore-session/firmware/build/test_board_drive.exe
+ M runs/20261122-restore-session/firmware/build/test_front_clearance.exe
+ M runs/20261122-restore-session/firmware/build/test_grid_map.exe
+ M runs/20261122-restore-session/firmware/build/test_motion.exe
+ M runs/20261122-restore-session/firmware/build/test_motor_bench.exe
+ M runs/20261122-restore-session/firmware/build/test_navigation.exe
+ M runs/20261122-restore-session/firmware/build/test_teach_drive.exe
+ M runs/20261122-restore-session/firmware/build/test_tof_offset.exe
+ M runs/20261122-restore-session/firmware/build/test_vl53l0x.exe
+ M runs/20261122-restore-session/notes.md
+?? code_test_xetranhvatcan/Inc/course_route_planned.h
+?? code_test_xetranhvatcan/Tools/__pycache__/
+?? code_test_xetranhvatcan/Tools/plan_route.py
+?? runs/20261122-avoid-t11-t14-final-10mm/
+?? runs/20261122-final-leg-left-27mm/
+?? runs/20261122-final-leg-shift-12mm/
+?? runs/20261122-flash-optimize/
+?? runs/20261122-front-edge-avoid/
+?? runs/20261122-postflash-no-output-no-motion/
+?? runs/20261122-restore-session/firmware/build/sim_course_default.exe
+?? runs/20261123-sim-t9/
+?? runs/20261123-tof-stop-t9/
+?? runs/20261123-waypoint-avoid/
+?? runs/_build_out.txt
+?? runs/_chk_all.txt
+?? runs/_chk_sum.txt
+?? runs/_docs.txt
+?? runs/_git_status.txt
+?? runs/_h03.txt
+?? runs/_h04.txt
+?? runs/_heads.txt
+?? runs/_hex_info.txt
+?? runs/_hexlist.txt
+?? runs/_hexsize.txt
+?? runs/_hextail.txt
+?? runs/_hexzero.txt
+?? runs/_hits.txt
+?? runs/_includes.txt
+?? runs/_ls_tests.txt
+?? runs/_mtimes2.txt
+?? runs/_planrefs.txt
+?? runs/_printf.txt
+?? runs/_rel_sum.txt
+?? runs/_rel_tail.txt
+?? runs/_relfiles.txt
+?? runs/_relnow.txt
+?? runs/_retarget.txt
+?? runs/_route_now.txt
+?? runs/_simhits.txt
+?? runs/_size.txt
+?? runs/_steer.txt
+?? runs/_suite.log
+?? runs/_sweep2.txt
+?? runs/_sweep3.txt
+?? runs/_sweep4.log
+?? runs/_sweep5.log
+?? runs/_sweep6.log
+?? runs/_szbin.txt
+?? runs/_tests.txt
+?? runs/_tmp_consts.txt
+?? runs/_tmp_git.txt
+?? runs/_tmp_grid.txt
+?? runs/_tmp_ls.txt
+?? runs/_tol.txt
+?? runs/_trace_refs.txt
+?? runs/_tracefmt.txt
+?? runs/_v2_check.txt
+?? runs/_v_check.txt
+?? runs/_v_check2.txt
+?? runs/_v_trig.txt
+?? runs/_wa.txt
+?? runs/_wa_list.txt
+?? runs/build_release.log
+?? runs/build_release.ps1
+?? runs/build_sim.log
+?? runs/cfgrefs.txt
+?? runs/convert_done.txt
+?? runs/navdiff.txt
+?? runs/orig_route_head.h
+?? runs/pathrefs.txt
+?? runs/plan_50.txt
+?? runs/plan_50_validate.txt
+?? runs/plan_compare.txt
+?? runs/plan_header.txt
+?? runs/plan_new.txt
+?? runs/plan_plan.txt
+?? runs/plan_validate.txt
+?? runs/probe_now.txt
+?? runs/probe_now.txt.err
+?? runs/routeu.txt
+?? runs/run_tests_bg.ps1
+?? runs/sim_trace_scan.txt
+?? runs/summary_nominal.txt
+?? runs/summary_t9.txt
+?? runs/sweep_offset.ps1
+?? runs/tests.log
+?? runs/toolchain.txt
+?? runs/toolchain2.txt
+?? runs/trace_nominal_verify.txt
+?? runs/trace_nominal_verify.u8.txt
+?? runs/trace_t9_verify.txt
+?? runs/trace_t9_verify.u8.txt
+?? runs/verify_avoid.txt
+?? runs/waypoint_avoid_listing.txt
+?? runs/write_route_table.py
+ code_test_xetranhvatcan/Inc/course_route.h         | 190 ++++----
+ code_test_xetranhvatcan/Src/main.c                 |  10 +
+ code_test_xetranhvatcan/Src/navigation.c           | 127 ++++-
+ code_test_xetranhvatcan/Tests/sim_course.c         |  17 +-
+ docs/02-dinh-huong-giai-quyet.md                   |  23 +
+ docs/03-ngu-canh.md                                | 408 ++++++++++++++++
+ docs/04-nhat-ky-loi.md                             | 522 ++++++++++++++++-----
+ .../firmware/Inc/course_route.h                    |  38 +-
+ .../firmware/Inc/front_clearance.h                 |   6 +-
+ .../firmware/Inc/navigation.h                      |   1 +
+ runs/20261122-restore-session/firmware/Src/main.c  |  15 +-
+ .../firmware/Src/navigation.c                      |  71 ++-
+ .../firmware/Tests/sim_course.c                    |  31 +-
+ .../firmware/Tests/test_front_clearance.c          |  14 +-
+ .../firmware/Tests/test_navigation.c               |  32 +-
+ .../firmware/build/test_board_drive.exe            | Bin 370545 -> 370545 bytes
+ .../firmware/build/test_front_clearance.exe        | Bin 375254 -> 375254 bytes
+ .../firmware/build/test_grid_map.exe               | Bin 410206 -> 410206 bytes
+ .../firmware/build/test_motion.exe                 | Bin 418752 -> 418752 bytes
+ .../firmware/build/test_motor_bench.exe            | Bin 370972 -> 370972 bytes
+ .../firmware/build/test_navigation.exe             | Bin 521301 -> 521348 bytes
+ .../firmware/build/test_teach_drive.exe            | Bin 391772 -> 391772 bytes
+ .../firmware/build/test_tof_offset.exe             | Bin 370154 -> 370154 bytes
+ .../firmware/build/test_vl53l0x.exe                | Bin 375149 -> 375149 bytes
+ runs/20261122-restore-session/notes.md             |  12 +
+ 25 files changed, 1197 insertions(+), 320 deletions(-)

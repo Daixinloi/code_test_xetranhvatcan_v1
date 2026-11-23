@@ -1,0 +1,12 @@
+﻿.ninja_deps 61596
+.ninja_log 4413
+build.ninja 63995
+CMakeCache.txt 19034
+cmake_install.cmake 2621
+code_test_xetranhvatcan.bin 65504
+code_test_xetranhvatcan.elf 174936
+code_test_xetranhvatcan.elf.ltrans0.ltrans.su 16123
+code_test_xetranhvatcan.elf.ltrans1.ltrans.su 4080
+code_test_xetranhvatcan.hex 184320
+code_test_xetranhvatcan.map 305032
+compile_commands.json 47599

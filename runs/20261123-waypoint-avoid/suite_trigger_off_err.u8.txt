@@ -1,0 +1,11 @@
+﻿sim_off.exe : FAIL 209: state == NAV_WAIT_CLEARANCE && nav_diag.near_front_mask == 1u && 
+reference_active (nav=5 x=420 y=220 leg=0 heading=90000)
+At C:\Users\daitr\Downloads\code_test_xetranhvatcan_v1\runs\20261123-waypoint-avoid\suite_compare.ps
+1:28 char:5
++     & '.\build\sim_off.exe' 1> (Join-Path $dir 'suite_trigger_off_out ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL 209: state... heading=90000):String) [], RemoteEx 
+   ception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+OFF_EXIT=1

@@ -712,8 +712,21 @@ static bool Service_Front_Clearance(void)
     }
     return false;
   }
+  /* Navigation owns obstacle response while autonomous. Let it keep the
+   * surveyed route pose and execute its local sidestep; the emergency reverse
+   * guard invalidates pose and switches to manual, preventing route rejoin. */
+  if (Navigation_IsActive())
+    return false;
   int16_t encoder = Encoder_GetCount2();
-  ClearanceOutput out = FrontClearance_Update(&clearance, now, front, encoder, encoder);
+  ClearanceReading guard_front[3] = {front[0], front[1], front[2]};
+  if (Navigation_UsesCenteredField())
+  {
+    /* On the centered route Navigation owns all ToF response. The generic
+     * reverse guard must not invalidate its waypoint pose. */
+    guard_front[0].valid = false;
+    guard_front[2].valid = false;
+  }
+  ClearanceOutput out = FrontClearance_Update(&clearance, now, guard_front, encoder, encoder);
   if (!out.override && !clearance_active)
     return false;
   if (out.state == CLEARANCE_LIMIT_FAULT || out.state == CLEARANCE_SENSOR_TIMEOUT)

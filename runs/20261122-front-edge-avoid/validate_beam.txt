@@ -1,0 +1,27 @@
+﻿layer setpoint FINISH_BEAM_MM = 118.0 mm
+beam range at X=1280, Y=500  = 130.1 mm
+centre X for that range      = 1274.9 mm
+
+X     range   aim(off)  U-gap  T15-gap   note
+1230.0    11.8     44.9   -15.0   125.0
+1250.0    59.2     24.9     5.0   105.0
+1280.0   130.1     -5.1    35.0    75.0
+1300.0   177.5    -25.1    55.0    55.0
+1330.0   248.5    -55.1    85.0    25.0
+1350.0   295.8    -75.1   105.0     5.0
+1390.0   390.4   -115.1   145.0   -35.0
+
+closed loop: aim = X + aim_off, body moves 40% of the error per tick
+  drift   0.0 mm -> settles at X=1274.9  U gap  29.9 mm  T15 gap  80.1 mm
+  drift  88.0 mm -> settles at X=1274.9  U gap  29.9 mm  T15 gap  80.1 mm
+  drift 120.0 mm -> settles at X=1274.9  U gap  29.9 mm  T15 gap  80.1 mm
+
+corrected target envelope for valid beam ranges:
+  body X=1200.0 -> target X=1255.0 mm
+  body X=1230.0 -> target X=1255.0 mm
+  body X=1280.0 -> target X=1274.9 mm
+  body X=1390.0 -> target X=1274.9 mm
+  body X=1450.0 -> target X=1345.0 mm
+
+beam reach on the descent (Y window where the right beam sees the block):
+  X=1280 -> Y 163 .. 659 mm, so the layer holds its last aim below Y=163

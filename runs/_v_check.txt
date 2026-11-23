@@ -1,0 +1,6 @@
+﻿NOM rows=289
+T9 rows=305
+NOM offset!=0 count=288
+T9 offset!=0 count=304
+NOM max|offset|=0
+T9 max|offset|=0.939

@@ -1,0 +1,57 @@
+﻿31: if ((!t9_removed || i != GRID_T9_INDEX) && (!t3_removed || i != GRID_T3_INDEX) && OverlapBody(px, py, angle, grid_static_obstacles[i])) return names[i];
+36: if (extra_obstacle && course_route[0][1] != 730 &&
+45: float sx = px + navigation_config.sensor_forward_mm[i]*c - navigation_config.sensor_left_mm[i]*s;
+46: float sy = py + navigation_config.sensor_forward_mm[i]*s + navigation_config.sensor_left_mm[i]*c;
+50: if ((!t9_removed || n != GRID_T9_INDEX) && (!t3_removed || n != GRID_T3_INDEX)) range = fminf(range, HitDistance(sx,sy,dx,dy,grid_static_obstacles[n]));
+53: if (extra_obstacle) range = fminf(range, HitDistance(sx,sy,dx,dy,extra_rect));
+65: unsigned seed, unsigned poll, FILE *trace)
+80: NavigationRange front[3];
+82: front[sensor] = (NavigationRange){.valid=true,
+124: front[sensor] = (NavigationRange){.valid=true,.mm=Measure(sensor,px,py,angle),.tick=tick};
+132: if (!was_rolling) CHECK(front[1].mm >= 120);
+137: if (trace && i % 5 == 0)
+138: fprintf(trace,"%.2f,%.2f,%.2f,%lu,%lu,%ld,%ld,%u,%u,%u,%u,%.1f,%.3f,%.3f,%u\n",
+141: (long)nav_diag.x_mm,(long)nav_diag.y_mm,front[0].mm,front[1].mm,front[2].mm,
+149: if (contact) { if (getenv("SLIP_DIAG")) fprintf(stderr,"CONTACT %s %s st=%u heading=%.1f tof=%u/%u/%u local=%u\n",name,contact,state,angle/radians,front[0].mm,front[1].mm,front[2].mm,local_step); outcome = contact; break; }
+156: if (tick-last_move > 12000) { outcome = "stuck"; if (getenv("SLIP_DIAG")) fprintf(stderr, "%s st=%u local=%u next=%.8f center=%u left=%u right=%u goal=%.5f,%.5f x=%.5f,%.5f moving=%u sides=%d,%d blocked=%d retreat=%u yaw=%.3f tail=%.2f/%.2f backtracked=%d\n",name,state,local_step,next_distance,front[1].mm,front[0].mm,front[2].mm,local_x,local_y,x,y,motion,side_blocked,tried_other_side,prefer_lateral,nav_diag.retreats,yaw+90,tail_mm,tail_heading,backtracked); break; }
+191: NavigationRange front[3];
+193: front[0].mm = 240;
+194: front[2].mm = 155;
+196: front[2].mm = 90;
+198: front[0].mm = 70;
+203: front[0].mm = front[2].mm = 60;
+207: front[0].mm = 24;
+210: unsigned trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+211: CHECK(nav_trace[trace].state == NAV_WAIT_CLEARANCE && nav_trace[trace].front_mm[0] == 24);
+214: front[1].mm = 40;
+220: trace = (nav_trace_count - 1) % NAV_TRACE_CAPACITY;
+221: CHECK(nav_trace[trace].state == NAV_MPU_FAULT && nav_trace[trace].front_mm[1] == 40);
+236: NavigationRange front[3];
+240: CHECK(nav_trace_count == 1 && nav_trace[0].state == NAV_BORDER);
+241: CHECK(nav_trace[0].front_mm[1] == front[1].mm);
+256: NavigationRange front[3];
+258: front[0].mm = front[1].mm = front[2].mm = 500;
+266: for (unsigned s = 0; s < 3; ++s) front[s].tick = tick;
+283: NavigationRange front[3];
+285: front[0].mm = 900;
+286: front[1].mm = 45;
+287: front[2].mm = 200;
+290: front[0].mm = 200;
+291: front[2].mm = 900;
+317: front[1].mm = 70;
+339: NavigationRange front[3];
+360: static void CheckReferenceObstacleDetour(void)
+380: NavigationRange front[3];
+438: NavigationRange front[3];
+497: extra_obstacle = true;
+506: extra_obstacle = false;
+514: if (argc == 3 && !strcmp(argv[1], "trace")) {
+548: extra_obstacle = true;
+558: extra_obstacle = true;
+562: extra_obstacle = true;
+566: extra_obstacle = true;
+570: extra_obstacle = true;
+574: extra_obstacle = true;
+579: extra_obstacle = true;
+586: CheckReferenceObstacleDetour();
+587: puts("PASS: blocked reference route replans around static obstacles without contact");

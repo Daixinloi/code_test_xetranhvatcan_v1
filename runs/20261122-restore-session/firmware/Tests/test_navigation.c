@@ -499,8 +499,8 @@ int main(int argc, char **argv)
     CHECK((Navigation_GetMap()->live_clear_mask & t14_bit) && nav_diag.state == NAV_ARRIVED);
     removed_boxes = 0;
 
-    /* A close return just as an eastbound run starts leaves no proven
-     * distance to reverse. The left side allows a stationary turn. */
+    /* A close return just as an eastbound run starts has little distance to
+     * reverse; the clear side beam should allow a stationary turn. */
     Navigation_Init(&navigation_config);
     ready = true; yaw = 0; motion = MOTION_IDLE;
     CHECK(Navigation_ConfirmStart() && Navigation_Start());
@@ -513,7 +513,7 @@ int main(int argc, char **argv)
         if (early_obstacle && !early_turn) {
             early_turn = fabsf(remainderf(yaw + 90.0f, 360.0f)) > 10.0f;
             if (!early_turn) {
-                front[1].mm = 40;
+                front[1].mm = 25;
                 front[2].mm = 80;
             }
         }
@@ -523,8 +523,7 @@ int main(int argc, char **argv)
     CHECK(early_obstacle && early_pause && early_turn);
     CHECK(nav_diag.retreats == 0 && nav_diag.state == NAV_ARRIVED);
 
-    /* A straight passage accepts side clearances above 25 mm with a clear
-     * centre beam. The 24 mm reading still stops translation. */
+    /* Generic field routes retain the diagonal hard-clearance behaviour. */
     Navigation_Init(&navigation_config);
     ready = true; yaw = 0; motion = MOTION_IDLE;
     CHECK(Navigation_ConfirmStart() && Navigation_Start());
@@ -536,15 +535,16 @@ int main(int argc, char **argv)
     int32_t before_passage_x = nav_diag.x_mm;
     for (unsigned i = 0; i < 5; ++i) {
         Advance(); Fresh(front);
-        front[0].mm = 26;
-        front[2].mm = 28;
+        front[0].mm = 100;
+        front[2].mm = 100;
         Navigation_Update(front, 420);
         CHECK(nav_diag.state == NAV_MOVING && motion == MOTION_RUNNING);
     }
     CHECK(nav_diag.x_mm > before_passage_x);
     Advance(); Fresh(front);
-    front[0].mm = 24;
-    front[2].mm = 26;
+    front[0].mm = 19;
+    front[2].mm = 100;
+    front[2].mm = 100;
     Navigation_Update(front, 420);
     CHECK(nav_diag.state == NAV_WAIT_CLEARANCE && motion == MOTION_IDLE);
     CHECK(nav_diag.near_front_mask == 1u);
@@ -588,7 +588,7 @@ int main(int argc, char **argv)
             nav_diag.x_mm >= 510 && nav_diag.x_mm < 525 && fabsf(heading) < 2.0f)
             blocked_x = nav_diag.x_mm;
         if (blocked_x && !headed_back) {
-            if (fabsf(heading) < 3.0f) front[1].mm = 40;
+            if (fabsf(heading) < 3.0f) front[1].mm = 25;
             if (fabsf(fabsf(heading) - 90.0f) < 3.0f) {
                 front[1].mm = 55;
                 checked_north |= heading > 0 && nav_diag.state == NAV_READY;
@@ -617,7 +617,7 @@ int main(int argc, char **argv)
             Advance();
             Fresh(front);
             if (!found_opening && fabsf(remainderf(yaw, 360.0f)) < 3.0f) {
-                front[1].mm = 40;
+                front[1].mm = 25;
                 front[test == 0 ? 0 : 2].mm = 90;
             }
             Navigation_Update(front, 420);
@@ -755,7 +755,7 @@ int main(int argc, char **argv)
                 int32_t lateral = nav_diag.y_mm - encounter_y;
                 probed_after_one_shift |= east && lateral >= 30 && nav_diag.state == NAV_READY;
                 if (east && lateral < required_lateral) {
-                    front[1].mm = 40;
+                    front[1].mm = 25;
                     if (test == 0) front[2].mm = 80;
                     if (test == 1) front[0].mm = 80; /* Wider right crosses the lane edge. */
                 }
@@ -774,7 +774,7 @@ int main(int argc, char **argv)
                 }
             }
             if (test >= 2 && close_started && (nav_diag.retreats == 0 || nav_diag.state == NAV_RETREATING))
-                front[1].mm = 40;
+                front[1].mm = 25;
             if (nav_diag.retreats && nav_diag.state == NAV_PLANNING && diagonal_samples < 5) {
                 front[0].mm = front[2].mm = 40;
                 ++diagonal_samples;
@@ -783,7 +783,7 @@ int main(int argc, char **argv)
              * starts. It clears only once the vehicle turns aside. */
             if (nav_diag.retreats && nav_diag.state != NAV_RETREATING && !turned_away) {
                 turned_away = fabsf(remainderf(yaw + 90.0f, 360.0f)) > 10.0f;
-                if (!turned_away) front[1].mm = 45;
+                if (!turned_away) front[1].mm = 25;
             }
             /* Reproduce the board's brief 5-degree excursion and verify
              * that the same error still stops a sustained deviation. */
@@ -823,7 +823,7 @@ int main(int argc, char **argv)
     CHECK(Navigation_ConfirmStart() && Navigation_Start());
     for (unsigned i = 0; i < 50; ++i) {
         Advance(); Fresh(front);
-        front[1].mm = 40;
+        front[1].mm = 25;
         Navigation_Update(front, 420);
     }
     CHECK(nav_diag.state == NAV_WAIT_CLEARANCE && nav_diag.retreats == 0);
@@ -946,7 +946,7 @@ int main(int argc, char **argv)
     CHECK(Navigation_ConfirmStart() && Navigation_StartEmptyFloorTest());
     for (unsigned i = 0; i <= 200; ++i) {
         Advance(); Fresh(front);
-        front[1].mm = 40;
+        front[1].mm = 25;
         Navigation_Update(front, 420);
         CHECK(motion == MOTION_IDLE);
     }

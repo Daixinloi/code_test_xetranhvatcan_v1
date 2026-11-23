@@ -1,0 +1,21 @@
+100: static uint16_t path_index;
+283: nav_diag.path_index = path_index; nav_diag.path_length = map.path_length;
+404: path_index = 0;
+415: path_index = 0;
+481: path_index = 0;
+1340: path_index = 0;
+2132: GridResult result = Grid_Advance(&map, 4);
+2161: path_index = entry_pending ? 0 : 1;
+2217: if (state == NAV_MOVING) ++path_index;
+2231: if (!local_step && path_index >= map.path_length) {
+2236: path_index = 0;
+2256: if (!local_step && path_index > 0) {
+2261: int dx = (int)(map.path[path_index] % GRID_WIDTH) -
+2262: (int)(map.path[path_index-1] % GRID_WIDTH);
+2263: int dy = (int)(map.path[path_index] / GRID_WIDTH) -
+2264: (int)(map.path[path_index-1] / GRID_WIDTH);
+2265: while (path_index+1 < map.path_length) {
+2266: unsigned a = map.path[path_index], b = map.path[path_index+1];
+2273: ++path_index;
+2278: unsigned cell = map.path[path_index];
+2295: else ++path_index;

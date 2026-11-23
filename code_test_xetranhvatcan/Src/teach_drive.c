@@ -10,10 +10,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define STRAIGHT_PWM 280
 #define PIVOT_PWM 230
-#define TAP_TURN_TENTHS 50
+#define TAP_TURN_TENTHS 70
 #define HOLD_TIMEOUT_MS 300u
 #define SETTLE_MS 180u
 #define STALL_MS 750u

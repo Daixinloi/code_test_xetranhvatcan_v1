@@ -9,6 +9,29 @@ Mục tiêu kỹ thuật trước mắt là chạy trọn sân thật và về �
 3. **Né sớm theo ToF.** Dùng mắt giữa để phát hiện vật trên hướng tiến, hai mắt chéo quan sát khoảng hở từng bên. Kiểm tra cung né theo phần thân xe quét qua và cả hai loại biên. Nếu hai phía đều có cung an toàn, ưu tiên phải theo hướng xe. Nếu một phía thoáng hơn rõ rệt, ưu tiên phía đó. Khi hướng hành trình đã thông và thân xe đủ chỗ, nối lại tuyến ngay. Ưu tiên tiến theo cung. Khi phía trước bị chắn, chỉ đổi hướng nếu còn không gian quét an toàn. Giữ phanh khi chưa thể xác nhận đường an toàn hoặc dữ liệu cảm biến đã cũ.
 4. **Tách lớp điều hướng và bảo vệ.** Tận dụng tuyến chữ U và các nhánh dò đã có. Rà các trường hợp lặp quét, rẽ lại dù đã thông và dừng vì mục tiêu quá sát biên. Nếu cần đơn giản hóa, ưu tiên nhánh bám tuyến và né cục bộ mặc định. Giữ A* ở các cấu hình đang dùng nó cho tới khi có kiểm thử thay thế tương đương. Vòng điều khiển cần tiếp tục đọc ToF, MPU và lệnh dừng trong mọi trạng thái dò đường.
 
+## Kiến trúc áp dụng: Hybrid Waypoint + Local Reactive Avoidance
+
+- **Waypoint là tuyến danh định.** Dùng bảng `course_route` đã chạy qua 17 khối
+  tĩnh; E2 và yaw MPU cập nhật pose và bám lần lượt từng waypoint. Không cộng lệch
+  heading liên tục từ ToF chéo vào góc waypoint.
+- **Reactive layer luôn đọc ba ToF.** Tia giữa xác nhận vật cản ngay trên hướng
+  chạy; hai tia chéo đưa bằng chứng sớm vào map. Khi đoạn waypoint sắp tới bị map
+  chặn, Navigation lập detour cục bộ tới waypoint sau đó. Khi center xuống dưới
+  30 mm, thử lách vuông góc từng bước 80 mm, ưu tiên phải; nếu map không đủ khoảng
+  quét thân xe thì thử phía ngược lại. Sau khi lách, giữ con trỏ waypoint để nhập
+  lại tuyến danh định.
+- **Tách quyền xử lý.** Khi Navigation đang chạy, không cho guard lùi khẩn cấp
+  chung trong `main.c` chiếm quyền và vô hiệu hóa pose; Navigation tự dừng, né và
+  nối tuyến. Guard chung vẫn dùng cho chạy tay/ngoài Navigation.
+- **Biên đen là vùng cấm cứng trong hình học.** `InLeg`, `CourseTravel`,
+  `CourseRotate` và kiểm tra `NAV_BORDER` giữ tâm/thân xe trong map với turn
+  padding 74 mm (xe rộng 90 mm, thêm khoảng hở). Đây là bảo vệ dựa trên map và
+  odometry; cặp IR line hiện chưa được tích hợp vào state machine Navigation.
+- **Phạm vi random obstacle:** đọc/mapping ToF ba hướng, A* chỉ làm đường vòng cục
+  bộ để nhập lại waypoint; không thay tuyến danh định. Vị trí Ô 4–5 và khoảng hở
+  thực vẫn cần xác nhận bằng map/log sân. `NAV_SEARCH_BLOCKED` phải giữ xe dừng nếu
+  cả hai phía không có đường quét thân xe an toàn.
+
 ## Khép khoảng cách giữa mô phỏng và xe thật
 
 - **Hiệu chuẩn quãng đường và góc riêng.** Đánh dấu quãng đường thẳng đã đo, ghi chênh lệch E2 có dấu và yaw đầu/cuối. Chạy vài lượt cùng điều kiện, lấy `mm/xung = quãng đường thực (mm) / |ΔE2|` và so độ lặp lại. Hiệu chuẩn tiếp góc quay và khoảng quét thân xe. Cần phân biệt quãng đường tiến với số xung phát sinh khi xoay, tự lùi và trượt bánh.

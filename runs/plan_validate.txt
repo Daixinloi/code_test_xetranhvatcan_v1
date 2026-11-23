@@ -1,0 +1,9 @@
+﻿inflation 64 mm, middle extra 0 mm (middle block inflated by 64 mm)
+current route: 73 points, length 1899.8 mm, min clearance -1.0 mm
+  points inside an inflated obstacle: 3
+  segments crossing an inflated obstacle: 5
+    (734, 893) -> (742, 891)
+    (742, 891) -> (768, 884)
+    (1132, 753) -> (1146, 746)
+    (1146, 746) -> (1160, 739)
+    (1160, 739) -> (1175, 732)

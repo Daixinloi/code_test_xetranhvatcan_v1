@@ -1,0 +1,25 @@
+﻿5: grid_static_obstacles[18]) so the planned polyline is guaranteed collision free
+68: FINISH_ENTRY = (1275, 0)    # where the car crosses the finish line
+69: FINISH_NOSE = (1275, -65)   # last point of the hand-tuned route
+77: CURRENT_ROUTE = [
+94: def _pad(rect, pad):
+99: def _inside(rect, x, y):
+103: def _segment_hits_rect(rect, x0, y0, x1, y1):
+127: def _inflated(pad=INFLATE_MM, middle_extra=MIDDLE_EXTRA_MM):
+135: def _clearance(x, y, boxes):
+147: def _point_free(x, y, boxes):
+151: def _segment_free(x0, y0, x1, y1, boxes):
+201: def astar(grid, start_xy, goal_xy):
+243: def shortcut(path, boxes):
+257: def resample(path, step_mm=15.0):
+269: def route_length(path):
+273: def route_min_clearance(path, boxes):
+285: def leg_of(a, b):
+293: def leg_tags(points):
+298: def report(path, boxes, label):
+310: def emit_header(path, name="course_route"):
+321: def main():
+337: current_full = [START_NOSE] + CURRENT_ROUTE
+344: raw = astar(grid, START_ENTRY, FINISH_ENTRY)
+350: path = [START_NOSE] + path + [FINISH_NOSE]
+393: void Navigation_Init(const NavigationConfig *config)

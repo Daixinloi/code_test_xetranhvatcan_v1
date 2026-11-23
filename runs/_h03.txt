@@ -1,0 +1,34 @@
+﻿1: # Ngữ cảnh bàn giao cho phiên làm việc mới
+8: ### 2026-11-22 — Hạ nhẹ tuyến để né T11
+13: ### 2026-11-22 — Dịch phải đích và hiệu chỉnh hướng khi xe đang chạy
+20: ### 2026-11-22 — Cua xuống sớm/đụng vùng cấm trong ảnh mô phỏng
+27: ### 2026-11-22 — Lỗi chuyển động khi vào cua, giảm flash tuyến
+34: ### 2026-11-22 — Vệt vẫn đâm T11/T12 trong mô phỏng
+41: ### 2026-11-22 — Trở lại quay tại chỗ trước khi tiến
+48: ### 2026-11-22 — Khôi phục dừng rồi quay ở waypoint
+53: ## Bàn giao phiên gần nhất
+55: ### 2026-11-23 — Đã né được vật cản cục bộ ở T9 trong simulator (chưa nạp)
+92: ### 2026-11-23 — Sửa lỗi tràn bảng tuyến và khôi phục chạy liên tục (đường trống đã đạt)
+131: ### 2026-11-23 — Ứng viên ToF tránh dừng giả ở T9 (chưa nạp)
+152: ### 2026-11-23 — Sửa quyền điều khiển né T9; bản cập nhật chờ kiểm tra nguồn
+172: ### 2026-11-22 — Tối ưu flash: nén bảng tuyến sang cm (build xanh, 9/9 PASS)
+201: ### 2026-11-22 — Thêm lớp né mép trước bằng ToF cho chặng xuống đích (đã build, chưa nạp)
+285: ### 2026-11-22 — Nạp bản chặng cuối trái 27 mm thành công
+294: ### 2026-11-22 — Nạp bản chặng cuối trái 27 mm thất bại
+303: ### 2026-11-22 — chặng cuối trái 27 mm (X=1275), nới T11/T14, đã build chờ nạp
+339: ### 2026-11-22 — hạ Y vùng T11/T14, chặng cuối trái 10 mm, đã nạp
+441: ### 2026-11-22 — Tóm tắt ưu tiên cho chat mới
+492: ### 2026-11-22 — Đã nạp Teach với V lưu và U phát lại
+498: ### 2026-11-22 — Nạp và xác minh bản Teach ban đầu
+504: ### 2026-11-22 — Bản thử lái tay, ghi và phát lại không dùng ToF
+511: ### 2026-11-22 — Tái hiện nhánh dừng và sửa bản ghi chẩn đoán
+525: ## Nơi làm việc và các phần chính
+531: ## Cấu hình cần nhớ
+545: ## Lệnh và quy trình quan sát
+559: ## Trạng thái bàn giao và chỗ dễ nhầm
+582: ### 2026-11-23 — Tái hiện lỗi simulator qua T9, chưa có bản sửa đạt
+589: ### 2026-11-23 — `trace t9` đã qua vật cản và về đích trong simulator
+595: ### 2026-11-23 — Đã build Release mới, nạp đang chờ nguồn bo an toàn
+600: ### 2026-11-23 — Đã nạp Release tuyến qua T9
+605: ### 2026-11-23 — Đã thay bản vòng lớn bằng tuyến mặc định + né ToF giữa
+612: ### 2026-11-23 — Phiên tiếp theo: giữ waypoint, chưa hoàn tất tích hợp ToF

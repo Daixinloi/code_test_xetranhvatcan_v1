@@ -366,18 +366,31 @@ static void CheckReferenceObstacleDetour(void)
     CHECK(Navigation_ConfirmStart() && Navigation_Start());
     yaw = -90.0f;
     yaw_offset = 90.0f;
-    x = 600.0f;
-    y = 974.0f;
+    x = 900.0f;
+    y = 850.0f;
     entry_pending = false;
     route_leg = U_EAST;
-    reference_point = 19;
+    reference_point = 0;
+    while (reference_point + 1u < sizeof(course_route) / sizeof(course_route[0]) &&
+        course_route[reference_point][0] < 1078)
+        ++reference_point;
     reference_active = true;
-    local_step = LOCAL_IDLE;
-    State(NAV_READY);
+    local_step = LOCAL_REFERENCE;
+    local_x = course_route[reference_point][0];
+    local_y = course_route[reference_point][1];
+    next_heading = atan2f(local_y - y, local_x - x) / radians;
+    State(NAV_MOVING);
 
-    NavigationRange front[3];
-    StaticMapRanges(front);
-    CHECK(TryReference(front, 0));
+    NavigationRange front[3] = {
+        {.mm=1500, .valid=true, .tick=10},
+        {.mm=65, .valid=true, .tick=10},
+        {.mm=1500, .valid=true, .tick=10}
+    };
+    CHECK(!Observe(front)); /* first sample only arms confirmation */
+    front[0].tick = front[1].tick = front[2].tick = 20;
+    CHECK(Observe(front));
+    CHECK(map.observed_count && !ReferenceClear(local_x, local_y, next_heading, 2));
+    CHECK(BeginReferenceDetour(reference_point));
     CHECK(state == NAV_PLANNING && reference_detour_active);
 
     for (unsigned n = 0; n < 30000 && reference_detour_active; ++n) {
@@ -579,7 +592,7 @@ int main(int argc, char **argv)
             puts("PASS: lateral detour recovers brief heading lag and rejects severe drift");
         } else if (!strcmp(argv[2], "reference_detour")) {
             CheckReferenceObstacleDetour();
-            puts("PASS: blocked reference route replans around static obstacles without contact");
+            puts("PASS: confirmed centre-ToF obstacle replans locally and rejoins the reference route");
         } else return 2;
         return 0;
     }

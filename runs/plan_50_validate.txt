@@ -1,0 +1,4 @@
+﻿inflation 50 mm, middle extra 0 mm (middle block inflated by 50 mm)
+current route (with start entry): 74 points, length 2526.8 mm, min clearance 5.7 mm
+  points inside an inflated obstacle: 0
+  segments crossing an inflated obstacle: 0

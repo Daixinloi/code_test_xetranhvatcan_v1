@@ -1,0 +1,2 @@
+﻿old entries: 92, new entries: 92
+MATCH: register write sequence is identical

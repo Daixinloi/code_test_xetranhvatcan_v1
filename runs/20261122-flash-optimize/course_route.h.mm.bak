@@ -1,0 +1,55 @@
+#ifndef COURSE_ROUTE_H
+#define COURSE_ROUTE_H
+#define COURSE_ROUTE_START_X_MM 420
+#define COURSE_FIXED_LINE_TEST 1
+
+/* Set to 1 to fly the A* shortest path from Tools/plan_route.py instead of the
+ * hand-tuned curve below. Both tables are measured with the same obstacle table
+ * the MCU uses (grid_static_obstacles[18]):
+ *   planned  : 94 points, 2392.3 mm, min clearance 1.4 mm at 52 mm inflation
+ *   hand-tuned: 73 points, 2521.6 mm (with the start entry), 0 collisions at
+ *               45 mm and 52 mm inflation (clearance to the inflated edge 23.7
+ *               and 13.8 mm); real clearance to the boxes: T11 87.1 mm,
+ *               T14 108.2 mm, T9 94.8 mm, T15 154.0 mm, U 75.0 mm
+ * The tuned curve is ~134 mm longer but much safer, so the A* route stays
+ * opt-in until it has been driven on the car.
+ *
+ * 2026-11-22 final-leg change: the whole descent moved from X = 1302 mm to
+ * X = 1275 mm so the 90 mm body keeps 80 mm to T15/T16 instead of 53 mm. The
+ * finish corridor is only 1200..1400 mm wide (U block edge to T15 edge), so a
+ * 90 mm body leaves 110 mm of legal centre travel: 1245..1355 mm. X = 1275 mm
+ * leaves 30 mm body edge to the U block and 80 mm to T15; a 70 mm shift would
+ * put the body 13 mm inside the U block, so 27 mm is the practical limit.
+ * At the 64 mm full half-diagonal inflation one segment in the T9/T11 gap still
+ * clips the inflated T11 corner; the 45 mm (real half-width) test is clean.
+ * Flash cost: the hand-tuned table is stored in centimetres (2 B per point, see
+ * below), so 71 points cost 142 B; the planned 94-point table costs 94 * 6 =
+ * 564 B, i.e. +422 B over the compressed hand-tuned table. */
+#define COURSE_ROUTE_USE_PLANNED 0
+
+#if COURSE_ROUTE_USE_PLANNED
+#include "course_route_planned.h"
+#define course_route course_route_planned
+#else
+static const int16_t course_route[][3] = {
+    {420, 582, 1},    {420, 596, 1},    {422, 611, 1},    {423, 625, 1},
+    {426, 639, 1},    {430, 652, 1},    {434, 666, 1},    {439, 679, 1},
+    {444, 692, 1},    {474, 755, 1},    {478, 764, 1},    {481, 773, 1},
+    {484, 782, 1},    {487, 791, 1},    {489, 800, 2},    {492, 809, 2},
+    {493, 819, 2},    {495, 828, 2},    {498, 862, 2},    {500, 871, 2},
+    {503, 878, 2},    {507, 885, 2},    {512, 890, 2},    {518, 895, 2},
+    {525, 898, 2},    {533, 899, 2},    {542, 900, 2},    {677, 900, 2},
+    {685, 900, 2},    {694, 899, 2},    {702, 899, 2},    {710, 898, 2},
+    {718, 897, 2},    {726, 898, 2},    {734, 892, 2},    {742, 885, 2},
+    {768, 867, 2},    {776, 861, 2},    {784, 856, 2},    {792, 851, 2},
+    {800, 851, 2},    {808, 851, 2},    {816, 851, 2},    {825, 851, 2},
+    {833, 851, 2},    {901, 851, 2},    {914, 851, 2},    {927, 849, 2},
+    {940, 846, 2},    {952, 842, 2},    {965, 837, 2},    {976, 831, 2},
+    {988, 825, 2},    {999, 818, 2},    {1078, 772, 2},    {1091, 762, 2},
+    {1104, 750, 2},    {1112, 735, 2},    {1120, 720, 2},    {1132, 708, 2},
+    {1146, 700, 2},    {1160, 696, 2},    {1175, 694, 2},    {1190, 692, 2},
+    {1240, 690, 2},    {1258, 680, 2},    {1264, 670, 2},    {1269, 661, 2},
+    {1272, 652, 2},    {1275, 643, 3},    {1275, -65, 3},
+};
+#endif /* COURSE_ROUTE_USE_PLANNED */
+#endif

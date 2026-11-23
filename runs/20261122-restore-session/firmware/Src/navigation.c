@@ -34,9 +34,11 @@
 #define U_T9_APPROACH_X_MM 485.0f
 #define U_T9_PASS_Y_MM 895.0f
 #define U_T9_LANE_Y_MM 880.0f
-#define U_REFERENCE_CRUISE_MM_S 210u
+#define U_REFERENCE_CRUISE_MM_S 250u
+#define U_TOF_SLOWDOWN_START_MM 80u
+#define U_TOF_SLOWDOWN_FLOOR_MM_S 90u
 #define U_AISLE_CLEAR_SAMPLE_MS 30u
-#define U_CLOSE_MM 25u
+#define U_CLOSE_MM 20u
 #define U_CLOSE_RETREAT_MM 20.0f
 #define U_CLOSE_RETREAT_MIN_MM 10.0f
 #define U_LEFT_LANE_MM 600
@@ -56,6 +58,7 @@
 #define U_BYPASS_DISTANCE_MM 250.0f
 #define U_BYPASS_DIAGONAL_MM 30u
 #define U_LOCAL_STEP_MM 50.0f
+#define U_CENTERED_LOCAL_STEP_MM 80.0f
 #define U_NARROW_SHIFT_MM 40.0f
 #define U_SOUTH_SHIFT_MM 60.0f
 #define U_EXTRA_SHIFT_MM 40.0f
@@ -629,6 +632,9 @@ static bool Observe(const NavigationRange front[3])
         (EarlyCourseBend() ? 290u : 245u) :
         FieldRoute() ? NAV_FIELD_OBSERVE_MM : NAV_OBSERVE_MM;
     for (unsigned i = 0; i < 3; ++i) {
+        /* Keep the proven waypoint path unchanged for side returns from T7/T9.
+         * The centered route starts a detour only for a confirmed obstacle in
+         * the centre beam, i.e. an object actually placed in front of the car. */
         if (CenteredField() && i != 1) continue;
         uint32_t previous_tick = sensor_seen[i];
         if (previous_tick == front[i].tick) continue;
@@ -733,10 +739,8 @@ static bool NearOutsideTurn(const NavigationRange front[3], uint32_t near);
 
 static uint16_t CloseRange(unsigned sensor)
 {
-    /* Allow for coasting when the right corner passes T9. */
-    return sensor == 2 && CenteredField() && route_leg == U_EAST &&
-        x >= 520.0f && x < 630.0f && y >= 835.0f && y < 925.0f
-        ? 50u : U_CLOSE_MM;
+    (void)sensor;
+    return U_CLOSE_MM;
 }
 
 static bool TryShortBackUp(const NavigationRange front[3], uint32_t confirmed)
@@ -815,7 +819,6 @@ static void WaitForClearance(const NavigationRange front[3], uint32_t near, uint
         local_step = LOCAL_CHECK;
     }
     if (obstacle && local_step == LOCAL_REFERENCE) {
-        reference_active = false;
         local_step = LOCAL_IDLE;
     }
     if (obstacle && local_step == LOCAL_JOIN) {
@@ -940,7 +943,7 @@ static bool TurnRoom(const NavigationRange front[3], uint32_t near, float retrea
         float turn_x = x - retreat * cosf(angle);
         float turn_y = y - retreat * sinf(angle);
         /* A front ray can lose a nearby face as the body begins to turn. */
-        float margin = CenteredField() ? (x < 940.0f ? 26.0f : 28.0f) : 16.0f;
+        float margin = CenteredField() ? (x < 940.0f ? 10.0f : 12.0f) : 16.0f;
         float hit_pad = pad + margin + (x < 540.0f ? 4.0f : 0.0f);
         for (unsigned i = 0; i < 3; i += 2) {
             float dx = turn_x - turn_hit[i].x, dy = turn_y - turn_hit[i].y;
@@ -1097,15 +1100,26 @@ static void ReferenceCruise(int16_t marker, float remaining, float heading, uint
     unsigned speed = marker == 3 ? 150u : marker && remaining < 95.0f ?
         (marker == 2 ? 85u : 105u) :
         (fabsf(remainderf(heading, 90.0f)) < 4.0f ? straight : 175u);
-    unsigned room = front_mm > CLEARANCE_CENTER_MIN_MM ?
-        (unsigned)front_mm - CLEARANCE_CENTER_MIN_MM : 0u;
-    /* Lower the speed target before the centre ToF reaches the stop threshold. */
-    unsigned approach_speed = 85u + 2u * room;
+    /* Start easing down well before the 50 mm hard-clearance threshold. The
+     * motion layer ramps velocity_ref, so this target also accelerates back
+     * smoothly after a detour when the centre beam clears. */
+    unsigned approach_speed = U_TOF_SLOWDOWN_FLOOR_MM_S;
+    if (front_mm > CLEARANCE_CENTER_MIN_MM) {
+        unsigned available = front_mm - CLEARANCE_CENTER_MIN_MM;
+        approach_speed += available * U_REFERENCE_CRUISE_MM_S /
+            (U_TOF_SLOWDOWN_START_MM - CLEARANCE_CENTER_MIN_MM);
+        if (approach_speed > U_REFERENCE_CRUISE_MM_S)
+            approach_speed = U_REFERENCE_CRUISE_MM_S;
+    }
     Motion_SetCruise(speed < approach_speed ? speed : approach_speed);
 }
 
 static float ForwardRoom(const NavigationRange front[3])
 {
+    /* Waypoints own the nominal heading. Diagonal beams feed the reactive map;
+     * they must not clamp forward progress or inject a continuously changing yaw. */
+    if (CenteredField())
+        return front[1].mm - (float)CLEARANCE_CENTER_MIN_MM;
     return fminf(front[1].mm - (float)CLEARANCE_CENTER_MIN_MM,
         fminf(SideRoom(front, 0), SideRoom(front, 2)));
 }
@@ -1456,7 +1470,8 @@ static void ExtendReference(const NavigationRange front[3])
         if (change < 0.75f || change > U_REFERENCE_TRACK_STEP_DEG) return;
         float fraction = committed / remaining;
         float tx = x + dx * fraction, ty = y + dy * fraction;
-        if (ReferenceClear(tx, ty, bearing, marker) && Motion_SteerForward(bearing - yaw_offset)) {
+        if (ReferenceClear(tx, ty, bearing, marker) &&
+            Motion_SteerForward(bearing - yaw_offset)) {
             next_heading = bearing;
             local_x = tx;
             local_y = ty;
@@ -1613,9 +1628,11 @@ static bool LocalTarget(int16_t step, uint32_t near, const NavigationRange front
         }
         return false;
     }
-    float shift = (route_leg == U_NORTH || (route_leg == U_EAST && x < U_EAST_WIDE_END_MM)) ?
-        U_LOCAL_STEP_MM : U_NARROW_SHIFT_MM;
+    float shift = CenteredField() ? U_CENTERED_LOCAL_STEP_MM :
+        (route_leg == U_NORTH || (route_leg == U_EAST && x < U_EAST_WIDE_END_MM)) ?
+            U_LOCAL_STEP_MM : U_NARROW_SHIFT_MM;
     if (route_leg == U_SOUTH) shift = U_SOUTH_SHIFT_MM;
+    if (CenteredField()) return LocalTargetAtDistance(step, near, front, shift);
     return LocalTargetAtDistance(step, near, front, shift) ||
         LocalTargetAtDistance(step, near, front, shift * 0.5f) ||
         LocalTargetAtDistance(step, near, front, shift * 0.25f);
@@ -1661,8 +1678,8 @@ static bool TryLocalStep(const NavigationRange front[3], uint32_t near, bool all
     int16_t left = route_leg == U_NORTH ? -1 : route_leg == U_EAST ? GRID_WIDTH : 1;
     if (detour_step != left && detour_step != -left) {
         if (CenteredField()) {
-            bool same_side = cosf((MapYaw() - LegHeading()) * DEG_RAD) >= 0.0f;
-            detour_step = PreferRight(front) == same_side ? -left : left;
+            bool facing_forward = cosf((MapYaw() - LegHeading()) * DEG_RAD) >= 0.0f;
+            detour_step = facing_forward ? -left : left; /* probe right first */
         } else {
             bool same_side = cosf((MapYaw() - LegHeading()) * DEG_RAD) >= 0.0f;
             detour_step = ((front[0].mm >= front[2].mm) == same_side) ? left : -left;
@@ -1978,12 +1995,16 @@ static void UpdateNavigation(const NavigationRange front[3], int16_t speed)
         bool range_ok = front[i].valid && front[i].mm < 8000;
         bool fresh = now - front[i].tick <= NAV_SENSOR_AGE_MS;
         uint16_t limit = FrontClearance_MinMm(i);
+        if (CenteredField() && i != 1) {
+            /* Diagonals map an early hazard; only the centre ray triggers the
+             * close-range local avoidance state. */
+            continue;
+        }
         if (i != 1) {
             if (CenteredField() || narrow_passage) limit = CloseRange(i);
             else if (TightDiagonals()) limit = U_BYPASS_DIAGONAL_MM;
         }
-        if (fresh && range_ok && (front[i].mm < limit || (FieldRoute() &&
-            state == NAV_MOVING && i != 1 && SideRoom(front, i) <= 2.0f))) {
+        if (fresh && range_ok && front[i].mm < limit) {
             near |= 1u << i;
             nav_diag.near_front_mm[i] = front[i].mm;
         }
@@ -2093,17 +2114,16 @@ static void UpdateNavigation(const NavigationRange front[3], int16_t speed)
         bool blocked = local_step == LOCAL_REFERENCE && course_route[reference_point][2] >= 2 ?
             !ReferenceClear(local_x, local_y, next_heading, 2) :
             !CourseTravel(x, y, local_x, local_y) || !CourseRotate(local_x, local_y);
-        if (local_step == LOCAL_REFERENCE && !ReferenceClear(
-                course_route[reference_point][0], course_route[reference_point][1],
-                next_heading, 2) && BeginArc(front, now))
-            return;
         if (blocked && local_step == LOCAL_REFERENCE && BeginReferenceDetour(reference_point)) {
             memset(candidate, 0, sizeof(candidate));
             return;
         }
-        /* Prefer fresh sensor data whenever the local fallback starts. */
-        Grid_ClearHits(&map);
+        if (local_step == LOCAL_REFERENCE && !ReferenceClear(
+                course_route[reference_point][0], course_route[reference_point][1],
+                next_heading, 2) && BeginArc(front, now))
+            return;
         if (blocked) {
+            Grid_ClearHits(&map);
             Motion_Cancel();
             memset(candidate, 0, sizeof(candidate));
             if (local_step == LOCAL_JOIN) join_active = false;
@@ -2404,6 +2424,7 @@ void Navigation_Update(const NavigationRange front[3], int16_t speed)
 }
 
 bool Navigation_IsActive(void) { return active; }
+bool Navigation_UsesCenteredField(void) { return active && CenteredField(); }
 const GridMap *Navigation_GetMap(void) { return &map; }
 const char *Navigation_GetLabel(void)
 {

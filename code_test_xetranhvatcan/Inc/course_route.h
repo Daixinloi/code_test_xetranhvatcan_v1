@@ -4,11 +4,22 @@
 
 /* Route points are stored in centimetres in flash and expanded to mm in RAM.
  * This trades 432 bytes of flash data for 432 bytes of available SRAM. */
-#define COURSE_ROUTE_START_X_MM 420
+#ifdef NAV_TEST_START_X_MM
+#define COURSE_ROUTE_START_X_MM NAV_TEST_START_X_MM
+#else
+#define COURSE_ROUTE_START_X_MM 300
+#endif
 #define COURSE_FIXED_LINE_TEST 1
-#define COURSE_ROUTE_COUNT 72u
+#define COURSE_ROUTE_COUNT 73u
 static int16_t course_route[COURSE_ROUTE_COUNT][3];
-static const int8_t course_route_cm[COURSE_ROUTE_COUNT][2] = {
+/* x is unsigned: the course reaches 1320 mm, which does not fit in int8_t.
+ * Storing x in a signed byte silently wrapped the last six points to about
+ * -1240 mm, so the car could never reach the goal. */
+static const struct { uint8_t x_cm; int8_t y_cm; }
+    course_route_cm[COURSE_ROUTE_COUNT] = {
+    /* Immediately angle right from the new start x=300 mm and join the
+     * original x=420 mm lane before reaching the T3 obstacle. */
+    {42, 20},
     {42, 58},
     {42, 60},
     {42, 61},
@@ -80,15 +91,15 @@ static const int8_t course_route_cm[COURSE_ROUTE_COUNT][2] = {
     {132, 66},
     {132, 63},
     {132, 62},
-    {132, -7},
+    {132, -10},
 };
 static inline void CourseRoute_Init(void)
 {
     for (unsigned i = 0; i < COURSE_ROUTE_COUNT; ++i) {
-        course_route[i][0] = (int16_t)course_route_cm[i][0] * 10;
-        course_route[i][1] = (int16_t)course_route_cm[i][1] * 10;
-        course_route[i][2] = i < 14u ? 1 : i < 69u ? 2 : 3;
+        course_route[i][0] = (int16_t)course_route_cm[i].x_cm * 10;
+        course_route[i][1] = (int16_t)course_route_cm[i].y_cm * 10;
+        course_route[i][2] = i < 15u ? 1 : i < 70u ? 2 : 3;
     }
 }
-#endif
-
+#endif
+

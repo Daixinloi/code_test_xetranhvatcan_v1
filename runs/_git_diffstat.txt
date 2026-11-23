@@ -1,0 +1,26 @@
+﻿ code_test_xetranhvatcan/Inc/course_route.h         | 190 ++++----
+ code_test_xetranhvatcan/Src/main.c                 |  10 +
+ code_test_xetranhvatcan/Src/navigation.c           | 127 ++++-
+ code_test_xetranhvatcan/Tests/sim_course.c         |  17 +-
+ docs/02-dinh-huong-giai-quyet.md                   |  23 +
+ docs/03-ngu-canh.md                                | 408 ++++++++++++++++
+ docs/04-nhat-ky-loi.md                             | 522 ++++++++++++++++-----
+ .../firmware/Inc/course_route.h                    |  38 +-
+ .../firmware/Inc/front_clearance.h                 |   6 +-
+ .../firmware/Inc/navigation.h                      |   1 +
+ runs/20261122-restore-session/firmware/Src/main.c  |  15 +-
+ .../firmware/Src/navigation.c                      |  71 ++-
+ .../firmware/Tests/sim_course.c                    |  31 +-
+ .../firmware/Tests/test_front_clearance.c          |  14 +-
+ .../firmware/Tests/test_navigation.c               |  32 +-
+ .../firmware/build/test_board_drive.exe            | Bin 370545 -> 370545 bytes
+ .../firmware/build/test_front_clearance.exe        | Bin 375254 -> 375254 bytes
+ .../firmware/build/test_grid_map.exe               | Bin 410206 -> 410206 bytes
+ .../firmware/build/test_motion.exe                 | Bin 418752 -> 418752 bytes
+ .../firmware/build/test_motor_bench.exe            | Bin 370972 -> 370972 bytes
+ .../firmware/build/test_navigation.exe             | Bin 521301 -> 521348 bytes
+ .../firmware/build/test_teach_drive.exe            | Bin 391772 -> 391772 bytes
+ .../firmware/build/test_tof_offset.exe             | Bin 370154 -> 370154 bytes
+ .../firmware/build/test_vl53l0x.exe                | Bin 375149 -> 375149 bytes
+ runs/20261122-restore-session/notes.md             |  12 +
+ 25 files changed, 1197 insertions(+), 320 deletions(-)
